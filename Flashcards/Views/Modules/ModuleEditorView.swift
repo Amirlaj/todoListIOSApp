@@ -86,3 +86,17 @@ struct ModuleEditorView: View {
         dismiss()
     }
 }
+
+#if DEBUG
+#Preview("New Module") {
+    let data = PreviewData()
+    return ModuleEditorView(module: nil)
+        .modelContainer(data.container)
+}
+
+#Preview("Edit Module") {
+    let data = PreviewData()
+    return ModuleEditorView(module: data.module)
+        .modelContainer(data.container)
+}
+#endif

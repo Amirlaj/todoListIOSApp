@@ -14,6 +14,12 @@ final class Flashcard {
     var timesCorrect: Int = 0
     var timesIncorrect: Int = 0
     var lastReviewedAt: Date?
+    var dueAt: Date?
+    var isFavorite: Bool = false
+    var tagText: String = ""
+
+    @Relationship(deleteRule: .cascade, inverse: \ReviewRecord.card)
+    var reviews: [ReviewRecord]? = []
 
     var chapter: Chapter?
     /// The file this card was imported from, or nil for cards added by hand.
@@ -44,7 +50,14 @@ extension Flashcard {
         return lastReviewedAt == nil ? .new : .learning
     }
 
-    func recordReview(correct: Bool) {
+    var tags: [String] { CardTags.parse(tagText) }
+    var reviewList: [ReviewRecord] { reviews ?? [] }
+
+    func isDue(at date: Date = .now) -> Bool {
+        (dueAt ?? .distantPast) <= date
+    }
+
+    func recordReview(correct: Bool, at date: Date = .now) {
         if correct {
             box = min(box + 1, Flashcard.maxBox)
             timesCorrect += 1
@@ -52,7 +65,8 @@ extension Flashcard {
             box = 0
             timesIncorrect += 1
         }
-        lastReviewedAt = .now
+        lastReviewedAt = date
+        dueAt = ReviewSchedule.nextDate(box: box, after: date)
     }
 
     func resetProgress() {
@@ -60,5 +74,6 @@ extension Flashcard {
         timesCorrect = 0
         timesIncorrect = 0
         lastReviewedAt = nil
+        dueAt = nil
     }
 }

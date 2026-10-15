@@ -10,7 +10,7 @@ final class SourceFile {
     var chapter: Chapter?
 
     @Relationship(deleteRule: .cascade, inverse: \Flashcard.sourceFile)
-    var cards: [Flashcard] = []
+    var cards: [Flashcard]? = []
 
     init(fileName: String, kind: SourceKind) {
         self.fileName = fileName
@@ -20,6 +20,8 @@ final class SourceFile {
 }
 
 extension SourceFile {
+    var cardList: [Flashcard] { cards ?? [] }
+
     var kind: SourceKind {
         SourceKind(rawValue: kindRaw) ?? .markdown
     }

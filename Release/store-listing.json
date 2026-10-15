@@ -1,0 +1,14 @@
+{
+  "name": "Flashies",
+  "subtitle": "Flashcards for daily study",
+  "primaryCategory": "EDUCATION",
+  "secondaryCategory": "PRODUCTIVITY",
+  "primaryLocale": "en-GB",
+  "suggestedPrice": "Free",
+  "keywords": "revision,study,spaced repetition,exam,vocabulary,learning,memorise,cards,notes",
+  "promotionalText": "Turn your notes into flashcards, review what is due, and keep your subjects organised across iPhone and iPad.",
+  "description": "Build a study routine around your own notes. Flashies organises flashcards into modules and chapters, so a whole subject stays easy to browse.\n\nImport CSV or Markdown files, review the extracted cards, or write cards by hand. Card text supports bold, italic, lists and code blocks. Add tags and favourites to focus a study session on the material you need.\n\nThe Review tab brings together cards that are due. Reveal the answer, then choose Got It or Again. Known cards return at increasing intervals; missed cards come back sooner. Set an optional daily reminder for a time that suits you.\n\nSee your review activity, accuracy and current study streak. Study offline, with your library and review history stored locally on your device.\n\nExport chapters or complete modules to keep a backup or share a file. Restore them as new copies, with the choice to keep progress or start fresh. CSV export lets you take your card text to other tools.\n\nMade for iPhone and iPad. No advertising, tracking SDKs or separate Flashies account.",
+  "whatsNew": "The first release of Flashies: organise flashcards, import notes, review on a schedule, track your study activity, and back up chapters or whole modules.",
+  "reviewNotes": "No Flashies account or login is required. On the Library tab, tap Add a Sample Module to try the app. Open Biology (Sample), choose a chapter, tap Study All, reveal an answer, then grade it. Review, Statistics and Settings are in the tab bar. Daily reminders are optional and request notification permission only when enabled. The library is stored locally on the device. Export Module is under a module's More menu; import is under Library's + menu. Chapter export is on the chapter toolbar. There are no advertisements, purchases, public profiles, social feeds or AI services.",
+  "testFlightWhatToTest": "Create modules and chapters. Import CSV and Markdown, checking duplicate detection. Study due cards and confirm the next review date changes after Got It or Again. Add tags and favourites, then filter in Review. Check Statistics after studying. Enable, reschedule and disable a daily reminder. Export and restore chapter and module files, both with and without progress. Relaunch the app and confirm that saved cards and progress remain available offline. Transfer an exported module to another device and import it there. Test large text, VoiceOver, dark mode, and iPhone/iPad layouts. Keep a module backup before testing deletions."
+}

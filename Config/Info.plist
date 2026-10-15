@@ -2,6 +2,43 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Flashies Chapter</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.amirlaj.Flashcards.chapter</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>flashies</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Flashies Module Backup</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.amirlaj.Flashcards.module</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>flashiesmodule</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -30,5 +67,11 @@
 			</dict>
 		</dict>
 	</array>
+	<key>FlashiesPrivacyURL</key>
+	<string>$(FLASHIES_PRIVACY_URL)</string>
+	<key>FlashiesSupportURL</key>
+	<string>$(FLASHIES_SUPPORT_URL)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

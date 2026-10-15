@@ -13,6 +13,8 @@ struct CardEditorView: View {
 
     @State private var front: String
     @State private var back: String
+    @State private var isFavorite: Bool
+    @State private var tagText: String
     @State private var isConfirmingDelete = false
 
     private let details: Details?
@@ -30,6 +32,8 @@ struct CardEditorView: View {
         self.onDelete = onDelete
         _front = State(initialValue: card?.front ?? "")
         _back = State(initialValue: card?.back ?? "")
+        _isFavorite = State(initialValue: card?.isFavorite ?? false)
+        _tagText = State(initialValue: card?.tagText ?? "")
         details = card.map {
             Details(
                 status: $0.status,
@@ -49,11 +53,13 @@ struct CardEditorView: View {
                 Section("Front") {
                     TextField("Question or term", text: $front, axis: .vertical)
                         .lineLimit(2...8)
+                        .accessibilityIdentifier("card-front-input")
                 }
 
                 Section {
                     TextField("Answer or definition", text: $back, axis: .vertical)
                         .lineLimit(3...14)
+                        .accessibilityIdentifier("card-back-input")
                 } header: {
                     Text("Back")
                 } footer: {
@@ -70,6 +76,16 @@ struct CardEditorView: View {
                         }
                         .padding(.vertical, 4)
                     }
+                }
+
+                Section {
+                    Toggle("Favourite", isOn: $isFavorite)
+                    TextField("Tags, separated by commas", text: $tagText)
+                        .textInputAutocapitalization(.never)
+                } header: {
+                    Text("Organise")
+                } footer: {
+                    Text("Use tags such as exam, vocabulary or difficult to filter cards in Review.")
                 }
 
                 if let details {
@@ -112,13 +128,35 @@ struct CardEditorView: View {
     }
 
     private func save() {
+        let savedCard: Flashcard
         if let card {
             card.front = trimmedFront
             card.back = trimmedBack
+            savedCard = card
         } else {
-            CardStore.addCards([ParsedCard(front: trimmedFront, back: trimmedBack)], to: chapter, in: modelContext)
+            let existingCards = chapter.cardList
+            savedCard = Flashcard(front: trimmedFront, back: trimmedBack, sortIndex: chapter.nextCardIndex)
+            modelContext.insert(savedCard)
+            savedCard.chapter = chapter
+            chapter.cards = existingCards + [savedCard]
         }
+        savedCard.isFavorite = isFavorite
+        savedCard.tagText = CardTags.parse(tagText).joined(separator: ", ")
         CardStore.save(modelContext)
         dismiss()
     }
 }
+
+#if DEBUG
+#Preview("New Card") {
+    let data = PreviewData()
+    return CardEditorView(chapter: data.chapter, card: nil)
+        .modelContainer(data.container)
+}
+
+#Preview("Edit Card") {
+    let data = PreviewData()
+    return CardEditorView(chapter: data.chapter, card: data.chapter.sortedCards.first)
+        .modelContainer(data.container)
+}
+#endif

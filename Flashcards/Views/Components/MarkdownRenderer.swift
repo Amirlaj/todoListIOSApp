@@ -108,3 +108,25 @@ struct MarkdownText: View {
         Text(MarkdownRenderer.render(source))
     }
 }
+
+#if DEBUG
+#Preview("Markdown", traits: .sizeThatFitsLayout) {
+    MarkdownText("""
+    # Cell Structure
+    A cell is the **basic unit of life**. Some organisms are *unicellular*.
+
+    - **Nucleus**: Stores DNA
+    - **Mitochondria**: Produce ATP
+
+    > Cells come from pre-existing cells.
+
+    Use `cell.count` to count cells.
+
+    ```swift
+    let cells = ["Plant", "Animal"]
+    ```
+    """)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding()
+}
+#endif

@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// A chapter's flashcards and imported files. Files are imported from the toolbar's + menu.
 struct ChapterDetailView: View {
@@ -18,10 +19,15 @@ struct ChapterDetailView: View {
     @State private var fileToDelete: SourceFile?
     @State private var isConfirmingReset = false
     @State private var searchText = ""
+    @State private var isExporting = false
+    @State private var exportDocument: ChapterDocument?
+    @State private var exportContentType = UTType.flashiesChapter
+    @State private var exportFilename = "Chapter"
+    @State private var exportError: String?
 
     var body: some View {
         Group {
-            if chapter.cards.isEmpty && chapter.sourceFiles.isEmpty {
+            if chapter.cardList.isEmpty && chapter.fileList.isEmpty {
                 emptyState
             } else {
                 chapterContent
@@ -29,7 +35,22 @@ struct ChapterDetailView: View {
         }
         .navigationTitle(chapter.name)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        exportChapter(asCSV: false)
+                    } label: {
+                        Label("Export Chapter", systemImage: "square.and.arrow.up")
+                    }
+                    Button {
+                        exportChapter(asCSV: true)
+                    } label: {
+                        Label("Export Cards as CSV", systemImage: "tablecells")
+                    }
+                    .disabled(chapter.cardList.isEmpty)
+                } label: {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                }
                 addMenu
             }
         }
@@ -41,6 +62,21 @@ struct ChapterDetailView: View {
         )
         .sheet(item: $importBatch) { batch in
             ImportPreviewView(chapter: chapter, batch: batch)
+        }
+        .fileExporter(
+            isPresented: $isExporting,
+            document: exportDocument,
+            contentType: exportContentType,
+            defaultFilename: exportFilename
+        ) { result in
+            if case .failure(let error) = result {
+                exportError = error.localizedDescription
+            }
+        }
+        .alert("Export Failed", isPresented: .isPresent($exportError)) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(exportError ?? "")
         }
         .sheet(isPresented: $isAddingCard) {
             CardEditorView(chapter: chapter, card: nil)
@@ -62,7 +98,7 @@ struct ChapterDetailView: View {
             titleVisibility: .visible,
             presenting: fileToDelete
         ) { file in
-            Button("Delete File and \(file.cards.count) Card(s)", role: .destructive) {
+            Button("Delete File and \(file.cardList.count) Card(s)", role: .destructive) {
                 modelContext.delete(file)
                 CardStore.save(modelContext)
             }
@@ -71,7 +107,7 @@ struct ChapterDetailView: View {
         }
         .confirmationDialog("Reset study progress?", isPresented: $isConfirmingReset, titleVisibility: .visible) {
             Button("Reset Progress", role: .destructive) {
-                chapter.cards.forEach { $0.resetProgress() }
+                chapter.cardList.forEach { $0.resetProgress() }
                 CardStore.save(modelContext)
             }
         } message: {
@@ -92,7 +128,7 @@ struct ChapterDetailView: View {
                 studyHeader
             }
 
-            if !chapter.sourceFiles.isEmpty {
+            if !chapter.fileList.isEmpty {
                 Section("Imported Files") {
                     ForEach(chapter.sortedSourceFiles) { file in
                         SourceFileRow(file: file)
@@ -120,6 +156,7 @@ struct ChapterDetailView: View {
                     } label: {
                         CardRow(card: card)
                     }
+                    .buttonStyle(.plain)
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {
                             modelContext.delete(card)
@@ -130,18 +167,18 @@ struct ChapterDetailView: View {
                     }
                 }
             } header: {
-                Text("Flashcards (\(chapter.cards.count))")
+                Text("Flashcards (\(chapter.cardList.count))")
             }
         }
         .searchable(text: $searchText, prompt: "Search flashcards")
     }
 
     private var studyHeader: some View {
-        let unmastered = chapter.cards.count - chapter.masteredCount
+        let unmastered = chapter.cardList.count - chapter.masteredCount
 
         return VStack(spacing: 14) {
             HStack {
-                StatView(value: chapter.cards.count, label: "Cards")
+                StatView(value: chapter.cardList.count, label: "Cards")
                 StatView(value: chapter.newCount, label: "New", tint: .blue)
                 StatView(value: chapter.learningCount, label: "Learning", tint: .orange)
                 StatView(value: chapter.masteredCount, label: "Mastered", tint: .green)
@@ -150,15 +187,26 @@ struct ChapterDetailView: View {
             ProgressView(value: chapter.progress)
                 .tint(.green)
 
+            let dueCards = chapter.sortedCards.filter { $0.isDue() }
+            Button {
+                studySession = StudySession(title: "Due: \(chapter.name)", cards: dueCards)
+            } label: {
+                Label("Review Due (\(dueCards.count))", systemImage: "calendar.badge.clock")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(dueCards.isEmpty)
+
             Button {
                 studySession = StudySession(title: chapter.name, cards: chapter.sortedCards)
             } label: {
                 Label("Study All", systemImage: "play.fill")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.bordered)
             .controlSize(.large)
-            .disabled(chapter.cards.isEmpty)
+            .disabled(chapter.cardList.isEmpty)
 
             Button {
                 studySession = StudySession(
@@ -218,7 +266,7 @@ struct ChapterDetailView: View {
             } label: {
                 Label("Supported Formats", systemImage: "questionmark.circle")
             }
-            if !chapter.cards.isEmpty {
+            if !chapter.cardList.isEmpty {
                 Button(role: .destructive) {
                     isConfirmingReset = true
                 } label: {
@@ -236,10 +284,23 @@ struct ChapterDetailView: View {
         guard !query.isEmpty else { return cards }
         return cards.filter {
             $0.front.localizedCaseInsensitiveContains(query) || $0.back.localizedCaseInsensitiveContains(query)
+                || $0.tags.contains { $0.localizedCaseInsensitiveContains(query) }
         }
     }
 
     // MARK: - Actions
+
+    private func exportChapter(asCSV: Bool) {
+        do {
+            let archive = ChapterTransfer.archive(chapter)
+            exportDocument = try ChapterDocument(archive: archive, asCSV: asCSV)
+            exportContentType = asCSV ? .commaSeparatedText : .flashiesChapter
+            exportFilename = archive.suggestedFilename
+            isExporting = true
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
 
     private func handlePickedFiles(_ result: Result<[URL], Error>) {
         switch result {
@@ -282,7 +343,7 @@ private struct SourceFileRow: View {
                     .font(.subheadline.weight(.medium))
                     .lineLimit(1)
                     .truncationMode(.middle)
-                Text("\(file.kind.displayName) · \(file.cards.count) card(s) · \(file.importedAt.formatted(date: .abbreviated, time: .omitted))")
+                Text("\(file.kind.displayName) · \(file.cardList.count) card(s) · \(file.importedAt.formatted(date: .abbreviated, time: .omitted))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -310,8 +371,29 @@ private struct CardRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             CardStatusBadge(status: card.status)
+            if card.isFavorite {
+                Image(systemName: "star.fill").foregroundStyle(.yellow).accessibilityLabel("Favourite")
+            }
         }
         .padding(.vertical, 2)
         .contentShape(Rectangle())
     }
 }
+
+#if DEBUG
+#Preview("Chapter Details") {
+    let data = PreviewData()
+    return NavigationStack {
+        ChapterDetailView(chapter: data.chapter)
+    }
+    .modelContainer(data.container)
+}
+
+#Preview("No Cards") {
+    let data = PreviewData(includeCards: false)
+    return NavigationStack {
+        ChapterDetailView(chapter: data.chapter)
+    }
+    .modelContainer(data.container)
+}
+#endif

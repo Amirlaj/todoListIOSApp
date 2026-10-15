@@ -81,3 +81,33 @@ extension Binding {
         )
     }
 }
+
+#if DEBUG
+#Preview("Progress Rings", traits: .sizeThatFitsLayout) {
+    HStack(spacing: 24) {
+        ProgressRing(progress: 0)
+        ProgressRing(progress: 0.5, tint: .blue)
+        ProgressRing(progress: 1)
+    }
+    .frame(height: 40)
+    .padding()
+}
+
+#Preview("Statistics", traits: .sizeThatFitsLayout) {
+    HStack {
+        StatView(value: 2, label: "Chapters")
+        StatView(value: 12, label: "Cards")
+        StatView(value: 4, label: "Mastered", tint: .green)
+    }
+    .padding()
+}
+
+#Preview("Card Statuses", traits: .sizeThatFitsLayout) {
+    HStack {
+        CardStatusBadge(status: .new)
+        CardStatusBadge(status: .learning)
+        CardStatusBadge(status: .mastered)
+    }
+    .padding()
+}
+#endif

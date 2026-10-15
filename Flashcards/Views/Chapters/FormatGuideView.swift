@@ -146,3 +146,9 @@ struct FormatGuideView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Supported Formats") {
+    FormatGuideView()
+}
+#endif

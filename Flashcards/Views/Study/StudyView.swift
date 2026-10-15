@@ -26,6 +26,8 @@ struct StudyView: View {
     @State private var dragOffset: CGSize = .zero
     @State private var isAdvancing = false
     @State private var hasStarted = false
+    @State private var saveError: String?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let swipeThreshold: CGFloat = 110
 
@@ -62,6 +64,11 @@ struct StudyView: View {
             guard !hasStarted else { return }
             start(with: session.cards)
             hasStarted = true
+        }
+        .alert("Review Not Saved", isPresented: .isPresent($saveError)) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "")
         }
     }
 
@@ -171,11 +178,11 @@ struct StudyView: View {
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: 15)
             .onChanged { value in
-                guard !isAdvancing else { return }
+                guard !isAdvancing, isRevealed else { return }
                 dragOffset = value.translation
             }
             .onEnded { value in
-                guard !isAdvancing else { return }
+                guard !isAdvancing, isRevealed else { return }
                 if abs(value.translation.width) > swipeThreshold {
                     grade(knewIt: value.translation.width > 0)
                 } else {
@@ -188,6 +195,15 @@ struct StudyView: View {
 
     private var optionsMenu: some View {
         Menu {
+            if let card = currentCard {
+                Button {
+                    card.isFavorite.toggle()
+                    CardStore.save(modelContext)
+                } label: {
+                    Label(card.isFavorite ? "Remove Favourite" : "Add Favourite", systemImage: card.isFavorite ? "star.slash" : "star")
+                }
+                Divider()
+            }
             Toggle(isOn: $shuffle) {
                 Label("Shuffle Cards", systemImage: "shuffle")
             }
@@ -293,16 +309,20 @@ struct StudyView: View {
 
     private func flip() {
         guard !isAdvancing, currentCard != nil else { return }
-        withAnimation(.easeInOut(duration: 0.4)) {
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.4)) {
             isRevealed.toggle()
         }
     }
 
     private func grade(knewIt: Bool) {
-        guard !isAdvancing, let card = currentCard else { return }
+        guard !isAdvancing, isRevealed, let card = currentCard else { return }
+        do {
+            try StudyStore.review(card, correct: knewIt, in: modelContext)
+        } catch {
+            saveError = error.localizedDescription
+            return
+        }
         isAdvancing = true
-
-        card.recordReview(correct: knewIt)
         if knewIt {
             knownCount += 1
         } else {
@@ -310,10 +330,10 @@ struct StudyView: View {
         }
 
         let exitDistance: CGFloat = knewIt ? 700 : -700
-        withAnimation(.easeIn(duration: 0.22)) {
+        withAnimation(reduceMotion ? nil : .easeIn(duration: 0.22)) {
             dragOffset = CGSize(width: exitDistance, height: dragOffset.height)
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0 : 0.22)) {
             isRevealed = false
             dragOffset = .zero
             withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
@@ -326,3 +346,11 @@ struct StudyView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Study Session") {
+    let data = PreviewData()
+    return StudyView(session: StudySession(title: data.chapter.name, cards: data.chapter.sortedCards))
+        .modelContainer(data.container)
+}
+#endif

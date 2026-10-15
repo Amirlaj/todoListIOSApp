@@ -24,7 +24,7 @@ struct ParseResult: Equatable {
 }
 
 /// The kind of file a set of cards was imported from.
-enum SourceKind: String, CaseIterable, Codable {
+enum SourceKind: String, CaseIterable, Codable, Sendable {
     case csv
     case markdown
 

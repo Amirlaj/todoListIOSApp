@@ -41,6 +41,16 @@
                ReferencedContainer = "container:Flashcards.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FC2000000000000000000008"
+               BuildableName = "FlashcardsUITests.xctest"
+               BlueprintName = "FlashcardsUITests"
+               ReferencedContainer = "container:Flashcards.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

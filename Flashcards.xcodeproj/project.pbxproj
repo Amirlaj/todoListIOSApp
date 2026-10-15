@@ -14,12 +14,20 @@
 			remoteGlobalIDString = FC1000000000000000000100;
 			remoteInfo = Flashcards;
 		};
+		FC2000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC1000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FC1000000000000000000100;
+			remoteInfo = Flashcards;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		FC1000000000000000000010 /* Flashcards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flashcards.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC1000000000000000000011 /* FlashcardsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlashcardsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC1000000000000000000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC2000000000000000000002 /* FlashcardsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlashcardsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -31,6 +39,11 @@
 		FC1000000000000000000021 /* FlashcardsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FlashcardsTests;
+			sourceTree = "<group>";
+		};
+		FC2000000000000000000003 /* FlashcardsUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FlashcardsUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -50,6 +63,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FC2000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -58,6 +78,7 @@
 			children = (
 				FC1000000000000000000020 /* Flashcards */,
 				FC1000000000000000000021 /* FlashcardsTests */,
+				FC2000000000000000000003 /* FlashcardsUITests */,
 				FC1000000000000000000040 /* Config */,
 				FC1000000000000000000041 /* Products */,
 			);
@@ -76,6 +97,7 @@
 			children = (
 				FC1000000000000000000010 /* Flashcards.app */,
 				FC1000000000000000000011 /* FlashcardsTests.xctest */,
+				FC2000000000000000000002 /* FlashcardsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -128,6 +150,27 @@
 			productReference = FC1000000000000000000011 /* FlashcardsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		FC2000000000000000000008 /* FlashcardsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC2000000000000000000009 /* Build configuration list for PBXNativeTarget "FlashcardsUITests" */;
+			buildPhases = (
+				FC2000000000000000000005 /* Sources */,
+				FC2000000000000000000004 /* Frameworks */,
+				FC2000000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FC2000000000000000000007 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FC2000000000000000000003 /* FlashcardsUITests */,
+			);
+			name = FlashcardsUITests;
+			productName = FlashcardsUITests;
+			productReference = FC2000000000000000000002 /* FlashcardsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -163,6 +206,7 @@
 			targets = (
 				FC1000000000000000000100 /* Flashcards */,
 				FC1000000000000000000101 /* FlashcardsTests */,
+				FC2000000000000000000008 /* FlashcardsUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -176,6 +220,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FC1000000000000000000061 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC2000000000000000000006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -199,6 +250,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FC2000000000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -206,6 +264,11 @@
 			isa = PBXTargetDependency;
 			target = FC1000000000000000000100 /* Flashcards */;
 			targetProxy = FC1000000000000000000301 /* PBXContainerItemProxy */;
+		};
+		FC2000000000000000000007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FC1000000000000000000100 /* Flashcards */;
+			targetProxy = FC2000000000000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -336,10 +399,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J2R63PWG83;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Config/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Flashcards;
+				INFOPLIST_KEY_CFBundleDisplayName = Flashies;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -366,10 +430,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J2R63PWG83;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Config/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Flashcards;
+				INFOPLIST_KEY_CFBundleDisplayName = Flashies;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -423,6 +488,32 @@
 			};
 			name = Release;
 		};
+		FC200000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amirlaj.FlashcardsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Flashcards;
+			};
+			name = Debug;
+		};
+		FC200000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amirlaj.FlashcardsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Flashcards;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -449,6 +540,15 @@
 			buildConfigurations = (
 				FC1000000000000000000214 /* Debug */,
 				FC1000000000000000000215 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC2000000000000000000009 /* Build configuration list for PBXNativeTarget "FlashcardsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC200000000000000000000A /* Debug */,
+				FC200000000000000000000B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

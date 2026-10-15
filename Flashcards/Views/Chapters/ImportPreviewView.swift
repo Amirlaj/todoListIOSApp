@@ -189,3 +189,33 @@ private struct CandidateRow: View {
         .accessibilityAddTraits(candidate.isSelected ? .isSelected : [])
     }
 }
+
+#if DEBUG
+#Preview("New and Duplicate Cards") {
+    let data = PreviewData()
+    let batch = ImportBatch(
+        parsedFiles: [
+            FlashcardImporter.parse(text: SampleData.cellStructureMarkdown, fileName: "cell-structure.md"),
+            FlashcardImporter.parse(text: SampleData.vocabularyCSV, fileName: "vocabulary.csv"),
+        ],
+        existingKeys: data.chapter.duplicateKeys
+    )
+    return ImportPreviewView(chapter: data.chapter, batch: batch)
+        .modelContainer(data.container)
+}
+
+#Preview("Import Error") {
+    let data = PreviewData()
+    let batch = ImportBatch(
+        parsedFiles: [ParsedFile(
+            fileName: "empty.csv",
+            kind: .csv,
+            cards: [],
+            errorMessage: FlashcardImporter.noCardsMessage
+        )],
+        existingKeys: []
+    )
+    return ImportPreviewView(chapter: data.chapter, batch: batch)
+        .modelContainer(data.container)
+}
+#endif

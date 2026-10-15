@@ -12,3 +12,10 @@ build/
 
 # macOS
 .DS_Store
+
+# Local release output and signing material
+*.xcresult/
+*.xcarchive/
+*.ipa
+*.p12
+*.mobileprovision

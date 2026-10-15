@@ -99,3 +99,25 @@ private struct CardFaceView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Question") {
+    FlipCardView(
+        front: "What is a cell?",
+        back: "The smallest **structural and functional unit** of a living organism.",
+        isFlipped: false
+    )
+    .frame(height: 400)
+    .padding(24)
+}
+
+#Preview("Answer") {
+    FlipCardView(
+        front: "Mitochondria",
+        back: "- Produce energy (ATP) through cellular respiration\n- Have their own DNA",
+        isFlipped: true
+    )
+    .frame(height: 400)
+    .padding(24)
+}
+#endif

@@ -56,11 +56,27 @@ struct ChapterEditorView: View {
         if let chapter {
             chapter.name = trimmedName
         } else {
+            let existingChapters = module.chapterList
             let newChapter = Chapter(name: trimmedName, sortIndex: module.nextChapterIndex)
             modelContext.insert(newChapter)
             newChapter.module = module
+            module.chapters = existingChapters + [newChapter]
         }
         CardStore.save(modelContext)
         dismiss()
     }
 }
+
+#if DEBUG
+#Preview("New Chapter") {
+    let data = PreviewData()
+    return ChapterEditorView(module: data.module, chapter: nil)
+        .modelContainer(data.container)
+}
+
+#Preview("Rename Chapter") {
+    let data = PreviewData()
+    return ChapterEditorView(module: data.module, chapter: data.chapter)
+        .modelContainer(data.container)
+}
+#endif

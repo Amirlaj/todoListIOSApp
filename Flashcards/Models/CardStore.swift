@@ -15,19 +15,25 @@ enum CardStore {
     ) -> SourceFile? {
         var sourceFile: SourceFile?
         if let fileName, let kind {
+            let existingFiles = chapter.fileList
             let file = SourceFile(fileName: fileName, kind: kind)
             context.insert(file)
             file.chapter = chapter
+            chapter.sourceFiles = existingFiles + [file]
             sourceFile = file
         }
 
         var nextIndex = chapter.nextCardIndex
         for parsed in parsedCards {
+            let existingCards = chapter.cardList
+            let existingSourceCards = sourceFile?.cardList ?? []
             let card = Flashcard(front: parsed.front, back: parsed.back, sortIndex: nextIndex)
             nextIndex += 1
             context.insert(card)
             card.chapter = chapter
             card.sourceFile = sourceFile
+            chapter.cards = existingCards + [card]
+            sourceFile?.cards = existingSourceCards + [card]
         }
         return sourceFile
     }

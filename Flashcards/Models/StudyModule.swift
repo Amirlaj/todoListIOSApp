@@ -10,7 +10,7 @@ final class StudyModule {
     var createdAt: Date = Date.now
 
     @Relationship(deleteRule: .cascade, inverse: \Chapter.module)
-    var chapters: [Chapter] = []
+    var chapters: [Chapter]? = []
 
     init(name: String, details: String = "", colorName: String = "blue") {
         self.name = name
@@ -21,12 +21,14 @@ final class StudyModule {
 }
 
 extension StudyModule {
+    var chapterList: [Chapter] { chapters ?? [] }
+
     var sortedChapters: [Chapter] {
-        chapters.sorted { ($0.sortIndex, $0.createdAt) < ($1.sortIndex, $1.createdAt) }
+        chapterList.sorted { ($0.sortIndex, $0.createdAt) < ($1.sortIndex, $1.createdAt) }
     }
 
     var nextChapterIndex: Int {
-        (chapters.map(\.sortIndex).max() ?? -1) + 1
+        (chapterList.map(\.sortIndex).max() ?? -1) + 1
     }
 
     /// All cards in the module, in chapter order.
@@ -35,11 +37,11 @@ extension StudyModule {
     }
 
     var cardCount: Int {
-        chapters.reduce(0) { $0 + $1.cards.count }
+        chapterList.reduce(0) { $0 + $1.cardList.count }
     }
 
     var masteredCount: Int {
-        chapters.reduce(0) { $0 + $1.masteredCount }
+        chapterList.reduce(0) { $0 + $1.masteredCount }
     }
 
     var progress: Double {

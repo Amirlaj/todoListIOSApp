@@ -9,6 +9,9 @@ struct ModuleListView: View {
     @State private var isCreatingModule = false
     @State private var editingModule: StudyModule?
     @State private var moduleToDelete: StudyModule?
+    @State private var isImportingModule = false
+    @State private var moduleArchive: ModuleArchive?
+    @State private var importError: String?
 
     var body: some View {
         NavigationStack {
@@ -28,10 +31,19 @@ struct ModuleListView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        isCreatingModule = true
+                    Menu {
+                        Button {
+                            isCreatingModule = true
+                        } label: {
+                            Label("New Module", systemImage: "plus")
+                        }
+                        Button {
+                            isImportingModule = true
+                        } label: {
+                            Label("Import Module", systemImage: "square.and.arrow.down")
+                        }
                     } label: {
-                        Label("New Module", systemImage: "plus")
+                        Label("Add Module", systemImage: "plus")
                     }
                 }
             }
@@ -40,6 +52,30 @@ struct ModuleListView: View {
             }
             .sheet(item: $editingModule) { module in
                 ModuleEditorView(module: module)
+            }
+            .fileImporter(isPresented: $isImportingModule, allowedContentTypes: [.flashiesModule], allowsMultipleSelection: false) { result in
+                Task {
+                    do {
+                        guard let url = try result.get().first else { return }
+                        let archive = try await Task.detached(priority: .userInitiated) {
+                            try ModuleDocument.readModule(at: url)
+                        }.value
+                        try await Task.sleep(for: .milliseconds(400))
+                        moduleArchive = archive
+                    } catch {
+                        importError = error.localizedDescription
+                    }
+                }
+            }
+            .sheet(isPresented: .isPresent($moduleArchive)) {
+                if let moduleArchive {
+                    ModuleImportView(archive: moduleArchive, existingNames: modules.map(\.name))
+                }
+            }
+            .alert("Import Failed", isPresented: .isPresent($importError)) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(importError ?? "")
             }
             .confirmationDialog(
                 "Delete this module?",
@@ -52,7 +88,7 @@ struct ModuleListView: View {
                     CardStore.save(modelContext)
                 }
             } message: { module in
-                Text("Its \(module.chapters.count) chapter(s) and \(module.cardCount) flashcard(s) will be deleted.")
+                Text("Its \(module.chapterList.count) chapter(s) and \(module.cardCount) flashcard(s) will be deleted.")
             }
         }
     }
@@ -108,6 +144,7 @@ struct ModuleListView: View {
             Button("Add a Sample Module") {
                 SampleData.insertSampleModule(into: modelContext)
             }
+            Button("Import Module Backup") { isImportingModule = true }
         }
     }
 }
@@ -133,7 +170,7 @@ private struct ModuleRow: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                Text("\(module.chapters.count) chapter(s) · \(module.cardCount) card(s)")
+                Text("\(module.chapterList.count) chapter(s) · \(module.cardCount) card(s)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -148,3 +185,16 @@ private struct ModuleRow: View {
         .padding(.vertical, 4)
     }
 }
+
+#if DEBUG
+#Preview("Sample Modules") {
+    let data = PreviewData()
+    return ModuleListView()
+        .modelContainer(data.container)
+}
+
+#Preview("No Modules") {
+    ModuleListView()
+        .modelContainer(for: [StudyModule.self, Chapter.self, Flashcard.self, SourceFile.self], inMemory: true)
+}
+#endif
