@@ -61,11 +61,13 @@ final class FlashiesUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Test Chapter"].waitForExistence(timeout: 5))
         app.staticTexts["Test Chapter"].tap()
         app.buttons["Add a Card Manually"].tap()
-        let front = app.textViews["card-front-input"]
+        // SwiftUI exposes multiline fields as TextView or TextField depending on iOS.
+        let front = app.descendants(matching: .any).matching(identifier: "card-front-input").firstMatch
         XCTAssertTrue(front.waitForExistence(timeout: 5))
         front.tap()
         front.typeText("Integration question")
-        let back = app.textViews["card-back-input"]
+        let back = app.descendants(matching: .any).matching(identifier: "card-back-input").firstMatch
+        XCTAssertTrue(back.waitForExistence(timeout: 5))
         // Tap the first text line, above the multiline field's empty padding.
         back.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.15)).tap()
         back.typeText("Integration answer")

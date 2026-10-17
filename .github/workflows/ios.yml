@@ -39,7 +39,6 @@ jobs:
             -project Flashcards.xcodeproj \
             -scheme Flashcards \
             -destination "id=${{ steps.simulator.outputs.udid }}" \
-            -quiet \
             -parallel-testing-enabled NO \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO
