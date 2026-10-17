@@ -61,6 +61,29 @@ struct CSVParserTests {
         let result = CSVParser.parse("Primary colours,Red<br>Yellow<br/>Blue")
         #expect(result.cards.first?.back == "Red\nYellow\nBlue")
     }
+
+    @Test func honoursExcelSeparatorDirectiveWithoutCreatingACardForIt() {
+        let result = CSVParser.parse("\u{FEFF}sep=;\r\nQuestion;Answer\r\nWhat is Σ?;A finite alphabet, e.g. {a, b}\r\n")
+        #expect(result.cards == [ParsedCard(front: "What is Σ?", back: "A finite alphabet, e.g. {a, b}")])
+        #expect(result.skipped == 0)
+        #expect(result.errorMessage == nil)
+        #expect(CSVParser.parse("sep=\t\nfront\tback\na\tb").cards == [ParsedCard(front: "a", back: "b")])
+    }
+
+    @Test func headerWinsOverPunctuationInIncompleteRows() {
+        let result = CSVParser.parse("front;back\nDFA;States, symbols, transitions\nAn incomplete row, with commas\nNFA;Zero, one or many choices")
+        #expect(result.cards == [
+            ParsedCard(front: "DFA", back: "States, symbols, transitions"),
+            ParsedCard(front: "NFA", back: "Zero, one or many choices"),
+        ])
+        #expect(result.skipped == 1)
+    }
+
+    @Test func unclosedQuoteReportsAnErrorInsteadOfCombiningTheRemainingCards() {
+        let file = FlashcardImporter.parse(text: "front,back\nDFA,\"A finite automaton\nNFA,Another automaton", fileName: "broken.csv")
+        #expect(file.cards.isEmpty)
+        #expect(file.errorMessage?.contains("closing quote") == true)
+    }
 }
 
 struct FlashcardImporterTests {
@@ -108,5 +131,38 @@ struct FlashcardImporterTests {
         let a = ParsedCard(front: "What is  DNA?", back: "Genetic\nmaterial")
         let b = ParsedCard(front: "what is DNA?", back: "genetic material ")
         #expect(a.duplicateKey == b.duplicateKey)
+    }
+
+    @Test func importsUTF16SpreadsheetExportsWithAndWithoutBOM() throws {
+        let text = "Question\tAnswer\r\nWhat is ε?\tThe empty string\r\nWhat is Σ?\tAn alphabet\r\n"
+        for encoding: String.Encoding in [.utf16, .utf16LittleEndian, .utf16BigEndian, .utf32] {
+            let bytes = try #require(text.data(using: encoding))
+            let decoded = try FlashcardImporter.decodeText(bytes)
+            let file = FlashcardImporter.parse(text: decoded, fileName: "excel.csv")
+            #expect(file.cards == [
+                ParsedCard(front: "What is ε?", back: "The empty string"),
+                ParsedCard(front: "What is Σ?", back: "An alphabet"),
+            ])
+        }
+    }
+
+    @Test func coordinatesPickedCSVReadAndPreservesMultilineUnicode() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID()).csv")
+        defer { try? FileManager.default.removeItem(at: url) }
+        // Use the same escaping as an actual spreadsheet CSV export.
+        let validCSV = "front,back\r\n\"Define ε\",\"Empty string\nLength: 0\"\r\n\"Explain \"\"union\"\"\",\"R ∪ S\""
+        try Data(validCSV.utf8).write(to: url)
+        let file = FlashcardImporter.parsePickedFile(at: url)
+        #expect(file.errorMessage == nil)
+        #expect(file.cards == [
+            ParsedCard(front: "Define ε", back: "Empty string\nLength: 0"),
+            ParsedCard(front: "Explain \"union\"", back: "R ∪ S"),
+        ])
+    }
+
+    @Test func givesActionableErrorForWorkbookSelectedInFiles() {
+        let file = FlashcardImporter.parseFile(at: URL(fileURLWithPath: "/tmp/deck.xlsx"))
+        #expect(file.cards.isEmpty)
+        #expect(file.errorMessage?.contains("export the sheet as CSV") == true)
     }
 }

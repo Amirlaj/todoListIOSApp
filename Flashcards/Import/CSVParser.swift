@@ -8,9 +8,22 @@ import Foundation
 ///   picks the columns; without one, the first column is the front and the second the back.
 enum CSVParser {
     static func parse(_ text: String, delimiter: Character? = nil) -> ParseResult {
-        let text = text.strippingByteOrderMark
-        let delimiter = delimiter ?? detectDelimiter(in: text)
-        let rows = rows(from: text, delimiter: delimiter).filter { row in
+        var text = text.strippingByteOrderMark
+        // Excel sometimes writes a separator directive before the actual header.
+        var declaredDelimiter: Character?
+        let firstLine = text.prefix(while: { !$0.isNewline })
+        let directive = firstLine.trimmingCharacters(in: .init(charactersIn: " "))
+        if directive.lowercased().hasPrefix("sep="), directive.count == 5,
+           let separator = directive.last, [",", ";", "\t"].contains(separator) {
+            declaredDelimiter = separator
+            text = String(text.dropFirst(firstLine.count).drop(while: { $0.isNewline }))
+        }
+        let delimiter = delimiter ?? declaredDelimiter ?? detectDelimiter(in: text)
+        let tokenized = tokenize(text, delimiter: delimiter)
+        guard !tokenized.unclosedQuote else {
+            return ParseResult(errorMessage: "A quoted CSV field is missing its closing quote. Close each quoted field and use two double quotes (\"\") for a quote inside a field.")
+        }
+        let rows = tokenized.rows.filter { row in
             row.contains { !$0.trimmed.isEmpty }
         }
         guard let firstRow = rows.first else { return ParseResult() }
@@ -35,6 +48,10 @@ enum CSVParser {
 
     /// Splits CSV text into rows of fields (RFC 4180 style).
     static func rows(from text: String, delimiter: Character) -> [[String]] {
+        tokenize(text, delimiter: delimiter).rows
+    }
+
+    private static func tokenize(_ text: String, delimiter: Character) -> (rows: [[String]], unclosedQuote: Bool) {
         let characters = Array(text)
         var rows: [[String]] = []
         var row: [String] = []
@@ -76,12 +93,20 @@ enum CSVParser {
             row.append(field)
             rows.append(row)
         }
-        return rows
+        return (rows, inQuotes)
     }
 
     /// Picks the delimiter that appears on the most lines (and most consistently) in the first lines of the file.
     static func detectDelimiter(in text: String) -> Character {
         let candidates: [Character] = ["\t", ",", ";"]
+        // A recognised header is stronger evidence than punctuation inside answers.
+        let sample = String(text.prefix(16_384))
+        for candidate in candidates {
+            if let first = rows(from: sample, delimiter: candidate).first(where: { $0.contains { !$0.trimmed.isEmpty } }),
+               ColumnMapping.fromHeader(first) != nil {
+                return candidate
+            }
+        }
         var lineCounts: [[Int]] = []
         var current = [Int](repeating: 0, count: candidates.count)
         var lineHasContent = false

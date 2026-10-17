@@ -1,0 +1,37 @@
+front,back
+What is an alphabet Σ?,"A **finite set of symbols** used to form strings. For example, Σ = {0, 1} or Σ = {a, b}."
+What is a string over an alphabet?,"A finite sequence of symbols from that alphabet. For Σ = {a, b}, `abba` is a string and its length is 4."
+"What does ε denote, and what is its length?","The **empty string**, containing no symbols. |ε| = 0. It is different from ∅, the empty set."
+What is Σ*?,"The set of **all finite strings** over Σ, including ε."
+"If an alphabet has m symbols, how many strings have length k?",**m^k**. Each of the k positions has m choices. For k = 0 there is one string: ε.
+What is a formal language over Σ?,Any set of strings over Σ: **L ⊆ Σ***. A language can be finite or infinite.
+How can a decision problem be represented as a language?,Encode each instance as a string. Put the encodings of all yes-instances in L. Solving the problem means deciding whether the input string belongs to L.
+What must a machine recognising L accept and reject?,It must accept **every string in L** and reject every string outside L. Accepting some correct examples is not enough.
+What are the five components of a DFSA?,"**(Q, Σ, δ, q₀, F)**: finite states Q; input alphabet Σ; transition function δ; start state q₀ ∈ Q; accepting states F ⊆ Q."
+What is the type of the DFSA transition function?,**δ: Q × Σ → Q**. Each state and input symbol determine exactly one next state.
+How many transitions must a complete DFSA define for each state?,Exactly **one transition for each symbol** in its alphabet. A rejecting sink state can handle inputs that must never lead to acceptance.
+When does a DFSA accept a string?,Start in q₀ and follow one transition per input symbol. Accept only if the state **after the entire input** is read belongs to F.
+Can a DFSA accept ε?,"Yes, exactly when **q₀ is an accepting state**. No transition is needed to read ε."
+How are start states and accept states drawn in a transition diagram?,The start state has an incoming arrow from nowhere. Accept states have **double circles**. Labelled directed arrows represent transitions.
+What does L(M) mean?,The language of machine M: the set of all input strings that M accepts.
+How can a two-state DFSA recognise an odd number of 1s?,"Use states **even** and **odd**, starting in even and accepting in odd. Reading 1 switches states; reading 0 leaves the state unchanged."
+How can a DFSA recognise binary strings with an even number of both 0s and 1s?,"Use four states for the parity pairs (even, even), (even, odd), (odd, even), (odd, odd). Start and accept at (even, even). Each symbol toggles its own parity."
+Does the even-0s/even-1s DFSA accept 1010 and 01101?,`1010` is accepted: it has two 0s and two 1s. `01101` is rejected: it has two 0s but three 1s.
+Describe the language 0 ∪ 1(0 ∪ 1)*.,"The one-symbol string `0`, together with all binary strings starting with `1`. It rejects ε and longer strings starting with 0."
+What distinguishes an NFSA from a DFSA?,"An NFSA may have **zero, one or several** possible transitions for a state-symbol pair, and may use ε-transitions."
+What does an ε-transition do?,It changes state **without consuming input**. ε is not an extra symbol in the input alphabet.
+When does an NFSA accept an input?,"When **at least one computation path** consumes the entire input and ends in an accepting state, possibly using ε-transitions."
+Does one failed NFSA path mean the input is rejected?,No. Other paths may accept. Rejection means **no accepting path exists** for the complete input.
+What happens when an NFSA path has no transition for the next symbol?,That path stops and fails. Other possible paths are still considered.
+How can the NFSA transition function be written?,"**δ: Q × (Σ ∪ {ε}) → P(Q)**, where P(Q) is the power set of Q. The result may be ∅."
+What is the ε-closure E(q)?,All states reachable from q using **zero or more ε-transitions**. It always includes q itself.
+"In subset construction, what does each DFSA state represent?",A **set of NFSA states** that could be active after the input read so far.
+What is the start state of the DFSA produced by subset construction?,**E(q₀)**: the ε-closure of the original NFSA start state.
+How do you calculate a subset-construction transition on symbol a?,"From every state in the current set, follow all a-transitions. Take the union of the results, then take their ε-closure."
+Which subset states are accepting?,Exactly those containing **at least one accepting NFSA state**: T ∩ F ≠ ∅.
+What does the empty subset ∅ represent in the converted DFSA?,No NFSA path remains possible. It is a rejecting sink: every input symbol sends ∅ back to ∅.
+When is subset construction finished?,When every reachable subset has a transition for every input symbol and **no new subsets** are being discovered.
+"If an NFSA has n states, what is the maximum number of subset states?","**2^n**, including ∅. Usually only a subset of these is reachable."
+Are NFSAs more powerful than DFSAs?,"No. They recognise **exactly the regular languages**. Every NFSA has an equivalent DFSA, although it may need more states."
+"In the lecture conversion, E(1) = {1,2,3,4} and F = {5}. Is the new start state accepting?","No: {1,2,3,4} does not contain 5. The reachable subsets {1,2,3,4,5}, {3,4,5} and {4,5} are accepting."
+How should you check a constructed automaton?,"Test accepted and rejected strings, ε, and boundary cases. Check every transition and acceptance condition against the language definition; examples alone are not a proof."

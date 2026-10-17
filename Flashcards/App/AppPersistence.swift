@@ -23,6 +23,8 @@ enum AppPersistence {
         #endif
         // Keep SwiftData's default store location so existing local libraries migrate in place.
         let configuration = ModelConfiguration(schema: schema, cloudKitDatabase: .none)
-        return try ModelContainer(for: schema, configurations: [configuration])
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        try SampleData.replaceLegacySampleIfNeeded(in: container.mainContext)
+        return container
     }
 }

@@ -1,0 +1,41 @@
+front,back
+Why is a*b* different from {a^n b^n | n ≥ 0}?,"`a*b*` permits independent numbers of as and bs. The second language requires **equal counts**. For example, aab belongs only to a*b*."
+Does an infinite language have to be nonregular?,"No. For example, a* and a*b* are infinite and regular. The issue is what relationships the machine must enforce, not just the number of words."
+What finite-state limitation makes {a^n b^n} nonregular?,An FSA cannot remember an arbitrarily large exact count of as to compare with later bs. Repeated states create loops that allow the counts to become unbalanced.
+State the pumping lemma for regular languages.,"If L is regular, some **p ≥ 1** exists such that every w ∈ L with |w| ≥ p has a split w = xyz where **|y| > 0**, **|xy| ≤ p**, and **xy^i z ∈ L for every i ≥ 0**."
+Why must the pumped part y be nonempty?,"If y = ε, pumping would never change the word. The lemma identifies a loop that consumes at least one input symbol."
+What does the condition |xy| ≤ p guarantee?,The entire repeated part y lies within the **first p symbols** of the chosen word. This often restricts y to one block of identical symbols.
+"What do pumping exponents i = 0, 1 and 2 do?","**i = 0:** delete y, giving xz. **i = 1:** keep the original word xyz. **i = 2:** repeat y once more, giving xyyz."
+Why can the number of DFSA states serve as a pumping length?,"Reading p symbols visits p + 1 states including the start. With only p states, a state must repeat; the segment between those visits is a loop."
+"What do x, y and z represent in the automaton proof?",**x:** the path to a repeated state. **y:** one traversal of its nonempty loop. **z:** the remaining path to an accepting state.
+Who chooses the word and who chooses its split in a nonregularity proof?,Assume L regular and let p be the promised length. **You choose w** depending on p. Your argument must work for **every valid split** xyz; then you may choose an exponent that breaks membership.
+What is the correct quantifier order in a pumping-lemma disproof?,"**For every p**, choose **some w ∈ L** of length at least p, such that **every allowed split** has **some i ≥ 0** with xy^i z ∉ L."
+Why is showing one bad split insufficient?,"Regularity requires the existence of **one good split** for each sufficiently long word. Another split might still pump successfully, so all allowed splits must be covered."
+Can the pumping lemma prove that a language is regular?,"Not by itself. Pumpability is a **necessary condition**, not a sufficient one. Prove regularity by constructing an FSA or RE, or using closure properties."
+Why do finite languages satisfy the pumping lemma?,"Choose p larger than every word length. No word meets |w| ≥ p, so the condition holds vacuously. Every finite language is also regular."
+Give the main steps of a pumping-lemma proof by contradiction.,"1. Assume L regular and take its pumping length p.
+2. Choose w ∈ L with |w| ≥ p.
+3. Analyse every valid split.
+4. Pump to get a word outside L.
+5. Conclude that L is not regular."
+Prove {a^n b^n | n ≥ 0} is not regular using pumping.,"Choose w = a^p b^p. Every valid y is a^j with 1 ≤ j ≤ p. Pumping down gives a^(p−j)b^p, whose counts differ. This contradicts the lemma."
+Why is a^p b^p c^(2p) useful for the addition language?,It belongs to {a^m b^n c^(m+n)} and its first p symbols are all a. Thus every valid y is a nonempty block of as.
+"Complete the pumping proof for {a^m b^n c^(m+n) | m,n ≥ 0}.","For w = a^p b^p c^(2p), let y = a^j with j > 0. Pumping up gives a^(p+j)b^p c^(2p). Now the a and b counts sum to 2p+j, not 2p, so the word is outside L."
+Why is ab^p a a poor witness for proving palindromes nonregular?,"Some allowed splits put y entirely in the middle b-block. Repeating that block leaves a palindrome, so this choice cannot rule out every split."
+"Give a successful pumping witness for palindromes over {a,b}.","Choose **a^p b a^p**. Every valid y lies in the first a-block. Pumping it changes only the left side of the central b, destroying the palindrome."
+"If one chosen word fails to yield a contradiction, is the language regular?",No. It may only mean that the witness was unsuitable. Try a different word or another proof technique.
+How does the pumping lemma show {a^n b^n a^n | n > 0} is nonregular?,"Choose a^p b^p a^p. The pumped segment is a nonempty part of the first a-block. Pumping down changes that block alone, so the three required counts no longer agree."
+"For {a^i b^n | i,n > 0 and i = n or i = 2n}, why is pumping down useful?","Choose a^p b^p. Deleting a nonempty y from the first a-block leaves fewer than p as and p bs. The a-count is then neither p nor 2p, so neither alternative holds."
+"How can you show {ww | w ∈ {a,b}*} is nonregular?",Choose a^p b a^p b. Pumping down removes j > 0 as only from the first block. A square containing exactly two bs and ending in b must have equal a-block lengths; the new blocks have lengths p−j and p.
+Why is {a^(n²) | n ≥ 0} nonregular?,"Choose a^(p²). A valid pumped segment has length j with 1 ≤ j ≤ p. Pumping up gives length p²+j, strictly between consecutive squares p² and (p+1)², so it is not in the language."
+How can you show {v u^m v^m | m ≥ 0} is nonregular?,"Choose v u^p v^p. If y contains the first v, pumping down removes the required prefix. Otherwise y is a nonempty block of us; pumping down makes the u-count smaller than the final v-count."
+What does it mean for a class of languages to be closed under an operation?,Applying the operation to languages in the class always produces another language **in the same class**.
+Which operations preserve regularity?,"**Union, intersection, concatenation, Kleene star and complement** preserve regular languages. Complement is taken relative to a fixed alphabet Σ*."
+How can closure under intersection prove a language nonregular?,"Assume L regular and intersect it with a carefully chosen regular language R. If L ∩ R is a known nonregular language, closure gives a contradiction."
+Use closure to show that strings with equal numbers of as and bs are nonregular.,"Let Equal = {w | #a(w) = #b(w)}. Then **Equal ∩ a*b* = {a^n b^n}**. If Equal were regular, that intersection would be regular, contradicting its known nonregularity."
+What is the complement of L over alphabet Σ?,**Σ* \ L**: all strings over Σ that are not in L.
+What is a decision procedure?,An effective algorithm that **halts on every input** and correctly answers a yes/no question. A problem with such a procedure is decidable.
+Which four questions about regular languages are decidable in the lecture?,**Membership:** is w in L? **Emptiness:** is L empty? **Finiteness:** is L finite? **Equivalence:** do two automata or REs describe the same language?
+What are the four classes in the Chomsky hierarchy?,"**Type 3:** regular, finite automata. **Type 2:** context-free, pushdown automata. **Type 1:** context-sensitive, linear bounded automata. **Type 0:** recursively enumerable, Turing machines."
+Does nonregular mean not context-free?,No. **{a^n b^n | n ≥ 0}** is nonregular but context-free. Failure of a weaker model does not imply failure of a more powerful one.
+What is the difference between a regularity proof and a nonregularity proof?,"For regularity, build an equivalent FSA/RE or apply closure. For nonregularity, prove no FSA can work, often using pumping or a closure-based contradiction."

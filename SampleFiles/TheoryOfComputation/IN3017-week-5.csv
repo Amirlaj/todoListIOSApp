@@ -1,0 +1,59 @@
+front,back
+State the pumping lemma for context-free languages.,"If L is context-free, some **p ≥ 1** exists such that every w ∈ L with |w| ≥ p has a split **w = uvxyz** with **|vy| > 0**, **|vxy| ≤ p**, and **uv^i xy^i z ∈ L for all i ≥ 0**."
+Which parts are pumped in the CFL pumping lemma?,"**v and y**, using the **same exponent i**. The strings u, x and z remain unchanged."
+Must both v and y be nonempty?,"No. Either may be empty, but **they cannot both be empty**: |vy| > 0."
+What does |vxy| ≤ p restrict?,"The full window from the start of v to the end of y, **including x**, has length at most p. This is not a restriction to the beginning of w."
+Compare the regular and context-free pumping decompositions.,"**Regular:** w = xyz; pump y; |y| > 0; |xy| ≤ p.
+**Context-free:** w = uvxyz; pump v and y together; |vy| > 0; |vxy| ≤ p."
+What parse-tree idea explains CFL pumping?,"In a sufficiently deep parse tree, a nonterminal repeats along a path. Repeating or removing the derivation between those occurrences pumps the strings on its two sides."
+How do you use the CFL pumping lemma to prove a language is not context-free?,"Assume it is context-free, take its pumping length p, choose a long word in it, and show that **every valid five-part split** can be pumped outside the language."
+Can a successful pumping split prove a language is context-free?,"No. The pumping condition is necessary, not sufficient. A CFG or PDA construction is a direct way to prove context-freeness."
+Why choose a^p b^p c^p to disprove context-freeness of {a^n b^n c^n}?,"The word belongs to the language. A window vxy of length at most p **cannot reach both the a-block and c-block**, because the entire b-block lies between them."
+What cases must vxy cover in the proof for {a^n b^n c^n}?,"It lies within one block, across the a/b boundary, or across the b/c boundary. It cannot cover all three kinds of symbol."
+Why does pumping a^p b^p c^p give a contradiction?,"At least one symbol count changes because |vy| > 0, while at least one block’s count stays p. Pumping therefore breaks equal counts or the required block order. The result is outside the language."
+Does non-context-free imply nonregular?,"Yes. Every regular language is context-free, so a language outside the context-free class is also outside the regular class."
+How can you prove {a^(3n) b^(2n) c^n | n ≥ 0} is not context-free?,"Choose a^(3p)b^(2p)c^p. A length-p pumping window misses at least one block. Pumping changes at least one count while an unchanged block fixes n = p, so the required 3:2:1 ratio fails (or block order is broken)."
+"For {10^n10^n10^n | n ≥ 0}, what witness makes the CFL pumping proof manageable?",Choose **10^p10^p10^p**. A window of length at most p includes at most one 1 and can affect at most two of the three zero-blocks.
+How does pumping 10^p10^p10^p break its language?,"If a pumped part contains 1, pumping changes the required count of three 1s. Otherwise it changes at least one zero-block while another remains length p, breaking equality of all three blocks."
+"How can you show {a^(n+m)b^n a^m b^n | n,m ≥ 0} is not context-free?","Choose a^(2p)b^p a^p b^p and pump up. A length-p window cannot affect both b-blocks. Changing a b-count unbalances them. If only as change, only one a-block can change, breaking the relation first a-count = first b-count + second a-count. Crossing an ordered block inside a pumped part also breaks the pattern."
+"What witness can disprove context-freeness of {www | w ∈ {a,b}*}?","Choose **(a^p b)^3**. A length-p pumping window meets at most one b. Pumping a b changes the total from 3 to 4, impossible for a triple. Pumping only as changes at most two a-blocks, so the three copies no longer match."
+What information belongs in each line of a PDA trace?,"The **current state, unread input, and full stack**. State which end of your written stack is the top, and include ε-transitions as separate steps."
+Why must ε-transitions be included in a PDA trace?,They can change the state and stack without consuming input. Omitting them can give incorrect stack counts or hide possible computation paths.
+"In Exercise 5, an a pushes A on s₀ → u, then an ε-step u → s₀ pushes another A. How many As does each input a add?",**Two As**. One is pushed while reading a and one by the compulsory ε-transition back to s₀.
+"In Exercise 5, why is aabb rejected by that PDA?","Two as push **four As**. Two bs pop only two, leaving AA after all input is read. The machine reaches v, but the stack is not empty."
+Trace Exercise 5’s PDA on aabbbb (top of stack written leftmost).,"**(s₀, aabbbb, ε)**
+→ (u, abbbb, A)
+→ (s₀, abbbb, AA)
+→ (u, bbbb, AAA)
+→ (s₀, bbbb, AAAA)
+→ (v, bbb, AAA)
+→ (v, bb, AA)
+→ (v, b, A)
+→ **(v, ε, ε)**: accept."
+Which language does the Exercise 5 PDA recognise?,**{a^n b^(2n) | n ≥ 1}**. Every a pushes two markers and each b pops one. ε is rejected because s₀ is not accepting and there is no transition from it without reading input.
+Give a CFG for the Exercise 5 PDA’s language.,**S → aSbb | abb**. The base word has one a and two bs; each recursive step adds one a and two bs.
+"For S → XaaX and X → aX | bX | ε, what language is generated?","**(a ∪ b)*aa(a ∪ b)***: all strings over {a,b} containing the substring aa."
+Which replacement transitions simulate S → XaaX and X → aX | bX | ε?,"At working state f, use ε-input stack replacements **S → XaaX**, **X → aX**, **X → bX**, and **X → ε**. Also push S initially and add matching pop transitions for terminals a and b."
+"For S → Xa | Yb, X → Sb | b, Y → Sa | a, eliminate X and Y to describe S.","Substitution gives **S → Sba | Sab | ba | ab**. The language is **(ab ∪ ba)+**: one or more blocks, each either ab or ba."
+"Which stack replacements arise from S → Xa | Yb, X → Sb | b, Y → Sa | a?","Use one ε-input transition per alternative: **S → Xa**, **S → Yb**, **X → Sb**, **X → b**, **Y → Sa**, **Y → a**. Initialise with S and match terminal a or b against the stack top."
+"For S → ABg, A → gAc | gc, B → gB | ε, what language is generated?","**{g^n c^n g^m | n ≥ 1, m ≥ 1}**. A generates matching g/c blocks; B generates zero or more gs, and the final explicit g guarantees a nonempty suffix."
+"Give a derivation of gggcccggg from S → ABg, A → gAc | gc, B → gB | ε.",**S ⇒ ABg ⇒ gAcBg ⇒ ggAccBg ⇒ gggcccBg ⇒ gggcccgBg ⇒ gggcccggBg ⇒ gggcccggg**.
+"What is the stack alphabet for the standard PDA built from S → ABg, A → gAc | gc, B → gB | ε?","**Γ = {S, A, B, g, c}**: all grammar nonterminals and terminals. The input alphabet is just {g, c}."
+Which PDA transitions simulate A → gAc | gc and B → gB | ε?,"At f, add **((f, ε, A),(f, gAc))**, **((f, ε, A),(f, gc))**, **((f, ε, B),(f, gB))**, and **((f, ε, B),(f, ε))**. Push each right-hand side so its leftmost symbol is on top."
+"Give a CFG for {g^m c^k g^n | m > 0, k > m, n > 0}.","**S → XYZ**
+**X → gXc | gc**
+**Y → cY | c**
+**Z → gZ | g**
+X balances the initial gs with cs; Y adds at least one extra c; Z supplies at least one final g."
+"In the provided PDA trace for aababccb, what state sequence is followed?",**1 → 2 → 1 → 3 → 2 → 1 → 2 → 4 → 4**. Each step consumes the next input character.
+"In the provided aababccb trace, what is the stack after each symbol (top left)?","**ε → + → −+ → −−+ → −−−+ → −−+ → −+ → + → ε**. The final state is 4, an accepting state, and the input is exhausted."
+Why does the provided PDA accept aababccb?,"The displayed path consumes **all eight symbols**, ends in accepting state 4, and leaves an **empty stack**. All three acceptance requirements hold."
+"In the extra deterministic PDA exercise, what state path accepts aaabbaabbb?","**1 → 2 → 2 → 2 → 3 → 3 → 4 → 4 → 5 → 5 → 5**. The first as push stars, the next bs push hashes, the next as pop hashes, and the final bs pop stars."
+What stack sequence accompanies aaabbaabbb in the extra PDA exercise (top left)?,`ε → * → ** → *** → #*** → ##*** → #*** → *** → ** → * → ε`. The computation finishes in accepting state 5 after all input is read.
+"Give a CFG for the extra exercise’s language {ac^m b^n ca^n | n,m ≥ 0}.","**S → aCT**
+**C → cC | ε**
+**T → bTa | c**
+C supplies the independent c-prefix; T balances each b with a later a around the central c."
+What does reaching an accepting PDA state with unread input tell you?,It is **not yet acceptance**. The chosen computation must still consume the entire input and satisfy the module’s empty-stack requirement.
+Why is a correct stack count alone insufficient when checking a PDA?,"You must also check **symbol order, transition availability, final state and complete input consumption**. A stack may be empty after an invalid or unfinished prefix."
+What final checks should accompany an exam CFG-to-PDA answer?,"State Q, Σ, Γ, s₀ and F; include the initial push, every production alternative and every terminal match; specify push order and the acceptance convention; trace a short accepted and rejected input."

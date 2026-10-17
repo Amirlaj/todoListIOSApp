@@ -12,6 +12,9 @@ extension FlashcardImporter {
         .delimitedText,
         markdownType,
         .plainText,
+        // Some providers report CSV/Markdown as generic data. Validate extensions
+        // after selection so those documents are not greyed out in Files.
+        .data,
     ]
 
     /// Parses a file returned by the document picker, which needs security-scoped access.

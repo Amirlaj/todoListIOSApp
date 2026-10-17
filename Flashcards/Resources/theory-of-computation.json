@@ -1,0 +1,828 @@
+{
+  "name": "Theory of Computation",
+  "details": "IN3017 · 2026/27 · Weeks 1–5",
+  "weeks": [
+    {
+      "name": "Week 1: Finite State Automata",
+      "sources": [
+        "FSA.pdf",
+        "Ex1FSA.pdf",
+        "SolnEx1FSA.pdf",
+        "NFSA_to_DFSA.pdf"
+      ],
+      "cards": [
+        {
+          "front": "What is an alphabet Σ?",
+          "back": "A **finite set of symbols** used to form strings. For example, Σ = {0, 1} or Σ = {a, b}."
+        },
+        {
+          "front": "What is a string over an alphabet?",
+          "back": "A finite sequence of symbols from that alphabet. For Σ = {a, b}, `abba` is a string and its length is 4."
+        },
+        {
+          "front": "What does ε denote, and what is its length?",
+          "back": "The **empty string**, containing no symbols. |ε| = 0. It is different from ∅, the empty set."
+        },
+        {
+          "front": "What is Σ*?",
+          "back": "The set of **all finite strings** over Σ, including ε."
+        },
+        {
+          "front": "If an alphabet has m symbols, how many strings have length k?",
+          "back": "**m^k**. Each of the k positions has m choices. For k = 0 there is one string: ε."
+        },
+        {
+          "front": "What is a formal language over Σ?",
+          "back": "Any set of strings over Σ: **L ⊆ Σ***. A language can be finite or infinite."
+        },
+        {
+          "front": "How can a decision problem be represented as a language?",
+          "back": "Encode each instance as a string. Put the encodings of all yes-instances in L. Solving the problem means deciding whether the input string belongs to L."
+        },
+        {
+          "front": "What must a machine recognising L accept and reject?",
+          "back": "It must accept **every string in L** and reject every string outside L. Accepting some correct examples is not enough."
+        },
+        {
+          "front": "What are the five components of a DFSA?",
+          "back": "**(Q, Σ, δ, q₀, F)**: finite states Q; input alphabet Σ; transition function δ; start state q₀ ∈ Q; accepting states F ⊆ Q."
+        },
+        {
+          "front": "What is the type of the DFSA transition function?",
+          "back": "**δ: Q × Σ → Q**. Each state and input symbol determine exactly one next state."
+        },
+        {
+          "front": "How many transitions must a complete DFSA define for each state?",
+          "back": "Exactly **one transition for each symbol** in its alphabet. A rejecting sink state can handle inputs that must never lead to acceptance."
+        },
+        {
+          "front": "When does a DFSA accept a string?",
+          "back": "Start in q₀ and follow one transition per input symbol. Accept only if the state **after the entire input** is read belongs to F."
+        },
+        {
+          "front": "Can a DFSA accept ε?",
+          "back": "Yes, exactly when **q₀ is an accepting state**. No transition is needed to read ε."
+        },
+        {
+          "front": "How are start states and accept states drawn in a transition diagram?",
+          "back": "The start state has an incoming arrow from nowhere. Accept states have **double circles**. Labelled directed arrows represent transitions."
+        },
+        {
+          "front": "What does L(M) mean?",
+          "back": "The language of machine M: the set of all input strings that M accepts."
+        },
+        {
+          "front": "How can a two-state DFSA recognise an odd number of 1s?",
+          "back": "Use states **even** and **odd**, starting in even and accepting in odd. Reading 1 switches states; reading 0 leaves the state unchanged."
+        },
+        {
+          "front": "How can a DFSA recognise binary strings with an even number of both 0s and 1s?",
+          "back": "Use four states for the parity pairs (even, even), (even, odd), (odd, even), (odd, odd). Start and accept at (even, even). Each symbol toggles its own parity."
+        },
+        {
+          "front": "Does the even-0s/even-1s DFSA accept 1010 and 01101?",
+          "back": "`1010` is accepted: it has two 0s and two 1s. `01101` is rejected: it has two 0s but three 1s."
+        },
+        {
+          "front": "Describe the language 0 ∪ 1(0 ∪ 1)*.",
+          "back": "The one-symbol string `0`, together with all binary strings starting with `1`. It rejects ε and longer strings starting with 0."
+        },
+        {
+          "front": "What distinguishes an NFSA from a DFSA?",
+          "back": "An NFSA may have **zero, one or several** possible transitions for a state-symbol pair, and may use ε-transitions."
+        },
+        {
+          "front": "What does an ε-transition do?",
+          "back": "It changes state **without consuming input**. ε is not an extra symbol in the input alphabet."
+        },
+        {
+          "front": "When does an NFSA accept an input?",
+          "back": "When **at least one computation path** consumes the entire input and ends in an accepting state, possibly using ε-transitions."
+        },
+        {
+          "front": "Does one failed NFSA path mean the input is rejected?",
+          "back": "No. Other paths may accept. Rejection means **no accepting path exists** for the complete input."
+        },
+        {
+          "front": "What happens when an NFSA path has no transition for the next symbol?",
+          "back": "That path stops and fails. Other possible paths are still considered."
+        },
+        {
+          "front": "How can the NFSA transition function be written?",
+          "back": "**δ: Q × (Σ ∪ {ε}) → P(Q)**, where P(Q) is the power set of Q. The result may be ∅."
+        },
+        {
+          "front": "What is the ε-closure E(q)?",
+          "back": "All states reachable from q using **zero or more ε-transitions**. It always includes q itself."
+        },
+        {
+          "front": "In subset construction, what does each DFSA state represent?",
+          "back": "A **set of NFSA states** that could be active after the input read so far."
+        },
+        {
+          "front": "What is the start state of the DFSA produced by subset construction?",
+          "back": "**E(q₀)**: the ε-closure of the original NFSA start state."
+        },
+        {
+          "front": "How do you calculate a subset-construction transition on symbol a?",
+          "back": "From every state in the current set, follow all a-transitions. Take the union of the results, then take their ε-closure."
+        },
+        {
+          "front": "Which subset states are accepting?",
+          "back": "Exactly those containing **at least one accepting NFSA state**: T ∩ F ≠ ∅."
+        },
+        {
+          "front": "What does the empty subset ∅ represent in the converted DFSA?",
+          "back": "No NFSA path remains possible. It is a rejecting sink: every input symbol sends ∅ back to ∅."
+        },
+        {
+          "front": "When is subset construction finished?",
+          "back": "When every reachable subset has a transition for every input symbol and **no new subsets** are being discovered."
+        },
+        {
+          "front": "If an NFSA has n states, what is the maximum number of subset states?",
+          "back": "**2^n**, including ∅. Usually only a subset of these is reachable."
+        },
+        {
+          "front": "Are NFSAs more powerful than DFSAs?",
+          "back": "No. They recognise **exactly the regular languages**. Every NFSA has an equivalent DFSA, although it may need more states."
+        },
+        {
+          "front": "In the lecture conversion, E(1) = {1,2,3,4} and F = {5}. Is the new start state accepting?",
+          "back": "No: {1,2,3,4} does not contain 5. The reachable subsets {1,2,3,4,5}, {3,4,5} and {4,5} are accepting."
+        },
+        {
+          "front": "How should you check a constructed automaton?",
+          "back": "Test accepted and rejected strings, ε, and boundary cases. Check every transition and acceptance condition against the language definition; examples alone are not a proof."
+        }
+      ]
+    },
+    {
+      "name": "Week 2: Regular Expressions",
+      "sources": [
+        "RegExp.pdf",
+        "Ex2RegExp.pdf",
+        "SolnEx2RegExp.pdf"
+      ],
+      "cards": [
+        {
+          "front": "What are the three regular operations?",
+          "back": "**Union (∪), concatenation, and Kleene star (*)**. They combine languages to build regular expressions."
+        },
+        {
+          "front": "What does the regular expression a denote?",
+          "back": "The one-word language **{a}**, where a is a symbol of the alphabet."
+        },
+        {
+          "front": "How do ε and ∅ differ as regular expressions?",
+          "back": "**ε** denotes {ε}, a language with one empty word. **∅** denotes a language with no words."
+        },
+        {
+          "front": "What is concatenation of languages R and S?",
+          "back": "**RS = {rs | r ∈ R and s ∈ S}**. Choose a word from R, then a word from S, and join them in that order."
+        },
+        {
+          "front": "Is language concatenation commutative?",
+          "back": "Usually not. If R = {a} and S = {b}, then RS = {ab} but SR = {ba}."
+        },
+        {
+          "front": "What does R ∪ S contain?",
+          "back": "Every word belonging to **R or S or both**."
+        },
+        {
+          "front": "What does R* contain?",
+          "back": "Every concatenation of **zero or more words from R**. Zero repetitions produce ε, so ε always belongs to R*."
+        },
+        {
+          "front": "For R = {ab, ba}, why is abba in R* but aab is not?",
+          "back": "`abba = ab · ba`, so it is a concatenation of words in R. Every word in R* has even length; `aab` has length 3."
+        },
+        {
+          "front": "What is the precedence of regular-expression operations?",
+          "back": "**Star first, concatenation second, union last.** Use parentheses whenever the intended grouping could be unclear."
+        },
+        {
+          "front": "How do ab* and (ab)* differ?",
+          "back": "`ab*` is one a followed by any number of bs: a, ab, abb, … . `(ab)*` repeats the whole block ab: ε, ab, abab, … ."
+        },
+        {
+          "front": "Simplify Rε, εR, R∅ and ∅R.",
+          "back": "**Rε = εR = R**. **R∅ = ∅R = ∅**: concatenating with the empty language cannot form any word."
+        },
+        {
+          "front": "Simplify R ∪ ∅, ε* and ∅*.",
+          "back": "**R ∪ ∅ = R**. **ε* = ∅* = {ε}** as languages, because zero repetitions always give the empty string."
+        },
+        {
+          "front": "Why can R ∪ {ε} differ from R?",
+          "back": "It adds the empty string if ε was not already in R. Union with ε is not the same operation as concatenation with ε."
+        },
+        {
+          "front": "Give a regular expression for binary strings ending in 1.",
+          "back": "**(0 ∪ 1)*1**. An arbitrary binary prefix is followed by a final 1."
+        },
+        {
+          "front": "Give a regular expression for strings over {a,b} starting with bb and containing at least one a.",
+          "back": "**bb(a ∪ b)*a(a ∪ b)***. The explicit a guarantees that at least one occurs."
+        },
+        {
+          "front": "Give a regular expression for lowercase strings containing the substring kleene.",
+          "back": "**Σ*kleeneΣ***, where Σ = {a, …, z}. The surrounding strings may be empty."
+        },
+        {
+          "front": "Give a regular expression for nonnegative decimal integers with no leading zero.",
+          "back": "**0 ∪ ND***, where N = (1 ∪ … ∪ 9) and D = (0 ∪ … ∪ 9). Only the single word 0 starts with zero."
+        },
+        {
+          "front": "Give a regular expression for positive decimal integers with no leading zero.",
+          "back": "**ND***, where N = (1 ∪ … ∪ 9) and D = (0 ∪ … ∪ 9). Unlike nonnegative integers, this excludes 0."
+        },
+        {
+          "front": "Give a regular expression for identifiers beginning with a lowercase letter, followed by letters or digits.",
+          "back": "**L(L ∪ D)***, where L = (a ∪ … ∪ z) and D = (0 ∪ … ∪ 9)."
+        },
+        {
+          "front": "Why do compilers use regular expressions in lexical analysis?",
+          "back": "Token classes such as identifiers, numbers and keywords can be described by REs and converted into finite automata that scan the program text."
+        },
+        {
+          "front": "State Kleene’s theorem.",
+          "back": "A language is **regular if and only if a regular expression describes it**. REs, NFSAs and DFSAs have the same expressive power."
+        },
+        {
+          "front": "How do you construct an NFSA for the union of two languages?",
+          "back": "Add a fresh start state with ε-transitions to the two component start states. Keep the component accepting states, or link them to a fresh final state."
+        },
+        {
+          "front": "How do you construct an NFSA for concatenation RS?",
+          "back": "Connect every accepting state of the R machine to the start of the S machine by an ε-transition. Start in R; only S’s accepting states accept the concatenation."
+        },
+        {
+          "front": "How do you adapt an NFSA for R to recognise R*?",
+          "back": "Allow an empty computation to accept, and add ε-transitions that permit another run of R after each successful run. The machine can choose zero, one or many repetitions."
+        },
+        {
+          "front": "What is a generalised NFSA (GNFA)?",
+          "back": "An automaton whose edges can be labelled by **regular expressions**, allowing one edge to match a whole string. It is also called a transition graph."
+        },
+        {
+          "front": "Does adding regular-expression labels make a GNFA more expressive than an FSA?",
+          "back": "No. Each RE-labelled edge can be expanded into an ordinary NFSA. The recognised language is still regular."
+        },
+        {
+          "front": "How do you prepare a GNFA for state elimination?",
+          "back": "Use a distinct start state with no incoming edges and one accepting state with no outgoing edges. Add fresh states and ε-transitions as needed."
+        },
+        {
+          "front": "How are parallel GNFA edges in the same direction combined?",
+          "back": "Replace them by one edge labelled with the **union** of their expressions. Parallel loops are combined in the same way."
+        },
+        {
+          "front": "When eliminating state k, what is the new expression from state i to state j?",
+          "back": "**Rᵢⱼ ∪ Rᵢₖ(Rₖₖ)*Rₖⱼ**. Preserve the direct route and add all routes through k, including zero or more loops at k."
+        },
+        {
+          "front": "What if the eliminated state has no loop?",
+          "back": "Treat the loop label as ∅; then ∅* = ε. The new route is just the incoming expression concatenated with the outgoing expression."
+        },
+        {
+          "front": "Eliminate a state with incoming label a, loop a ∪ b, and outgoing label ba. What new route is added?",
+          "back": "**a(a ∪ b)*ba**. The order is incoming label, repeated loop, outgoing label."
+        },
+        {
+          "front": "Does the order of state elimination affect the recognised language?",
+          "back": "No. It may produce differently shaped REs, but all are **equivalent** if each elimination preserves every possible route."
+        },
+        {
+          "front": "Why does the state-elimination algorithm terminate?",
+          "back": "Each elimination removes one non-start, non-final state. A finite automaton eventually has only its start and final states; the connecting expression describes its language."
+        },
+        {
+          "front": "Give a simple RE for strings containing aa or bb.",
+          "back": "**(a ∪ b)*(aa ∪ bb)(a ∪ b)***. The middle part forces two equal adjacent symbols."
+        },
+        {
+          "front": "Does every language have a regular expression?",
+          "back": "No. Every **regular** language does. For example, {a^n b^n | n ≥ 0} is nonregular, so no classical RE describes it."
+        },
+        {
+          "front": "What language does a(a ∪ b)*b describe?",
+          "back": "Strings over {a,b} that **start with a and end with b**, with length at least 2. It includes ab, aab and abb, but not a or ba."
+        }
+      ]
+    },
+    {
+      "name": "Week 3: Pumping Lemma for Regular Languages",
+      "sources": [
+        "PumpingLemma.pdf",
+        "Ex3Pumping_new.pdf",
+        "Example_PumpingLemma.pdf"
+      ],
+      "cards": [
+        {
+          "front": "Why is a*b* different from {a^n b^n | n ≥ 0}?",
+          "back": "`a*b*` permits independent numbers of as and bs. The second language requires **equal counts**. For example, aab belongs only to a*b*."
+        },
+        {
+          "front": "Does an infinite language have to be nonregular?",
+          "back": "No. For example, a* and a*b* are infinite and regular. The issue is what relationships the machine must enforce, not just the number of words."
+        },
+        {
+          "front": "What finite-state limitation makes {a^n b^n} nonregular?",
+          "back": "An FSA cannot remember an arbitrarily large exact count of as to compare with later bs. Repeated states create loops that allow the counts to become unbalanced."
+        },
+        {
+          "front": "State the pumping lemma for regular languages.",
+          "back": "If L is regular, some **p ≥ 1** exists such that every w ∈ L with |w| ≥ p has a split w = xyz where **|y| > 0**, **|xy| ≤ p**, and **xy^i z ∈ L for every i ≥ 0**."
+        },
+        {
+          "front": "Why must the pumped part y be nonempty?",
+          "back": "If y = ε, pumping would never change the word. The lemma identifies a loop that consumes at least one input symbol."
+        },
+        {
+          "front": "What does the condition |xy| ≤ p guarantee?",
+          "back": "The entire repeated part y lies within the **first p symbols** of the chosen word. This often restricts y to one block of identical symbols."
+        },
+        {
+          "front": "What do pumping exponents i = 0, 1 and 2 do?",
+          "back": "**i = 0:** delete y, giving xz. **i = 1:** keep the original word xyz. **i = 2:** repeat y once more, giving xyyz."
+        },
+        {
+          "front": "Why can the number of DFSA states serve as a pumping length?",
+          "back": "Reading p symbols visits p + 1 states including the start. With only p states, a state must repeat; the segment between those visits is a loop."
+        },
+        {
+          "front": "What do x, y and z represent in the automaton proof?",
+          "back": "**x:** the path to a repeated state. **y:** one traversal of its nonempty loop. **z:** the remaining path to an accepting state."
+        },
+        {
+          "front": "Who chooses the word and who chooses its split in a nonregularity proof?",
+          "back": "Assume L regular and let p be the promised length. **You choose w** depending on p. Your argument must work for **every valid split** xyz; then you may choose an exponent that breaks membership."
+        },
+        {
+          "front": "What is the correct quantifier order in a pumping-lemma disproof?",
+          "back": "**For every p**, choose **some w ∈ L** of length at least p, such that **every allowed split** has **some i ≥ 0** with xy^i z ∉ L."
+        },
+        {
+          "front": "Why is showing one bad split insufficient?",
+          "back": "Regularity requires the existence of **one good split** for each sufficiently long word. Another split might still pump successfully, so all allowed splits must be covered."
+        },
+        {
+          "front": "Can the pumping lemma prove that a language is regular?",
+          "back": "Not by itself. Pumpability is a **necessary condition**, not a sufficient one. Prove regularity by constructing an FSA or RE, or using closure properties."
+        },
+        {
+          "front": "Why do finite languages satisfy the pumping lemma?",
+          "back": "Choose p larger than every word length. No word meets |w| ≥ p, so the condition holds vacuously. Every finite language is also regular."
+        },
+        {
+          "front": "Give the main steps of a pumping-lemma proof by contradiction.",
+          "back": "1. Assume L regular and take its pumping length p.\n2. Choose w ∈ L with |w| ≥ p.\n3. Analyse every valid split.\n4. Pump to get a word outside L.\n5. Conclude that L is not regular."
+        },
+        {
+          "front": "Prove {a^n b^n | n ≥ 0} is not regular using pumping.",
+          "back": "Choose w = a^p b^p. Every valid y is a^j with 1 ≤ j ≤ p. Pumping down gives a^(p−j)b^p, whose counts differ. This contradicts the lemma."
+        },
+        {
+          "front": "Why is a^p b^p c^(2p) useful for the addition language?",
+          "back": "It belongs to {a^m b^n c^(m+n)} and its first p symbols are all a. Thus every valid y is a nonempty block of as."
+        },
+        {
+          "front": "Complete the pumping proof for {a^m b^n c^(m+n) | m,n ≥ 0}.",
+          "back": "For w = a^p b^p c^(2p), let y = a^j with j > 0. Pumping up gives a^(p+j)b^p c^(2p). Now the a and b counts sum to 2p+j, not 2p, so the word is outside L."
+        },
+        {
+          "front": "Why is ab^p a a poor witness for proving palindromes nonregular?",
+          "back": "Some allowed splits put y entirely in the middle b-block. Repeating that block leaves a palindrome, so this choice cannot rule out every split."
+        },
+        {
+          "front": "Give a successful pumping witness for palindromes over {a,b}.",
+          "back": "Choose **a^p b a^p**. Every valid y lies in the first a-block. Pumping it changes only the left side of the central b, destroying the palindrome."
+        },
+        {
+          "front": "If one chosen word fails to yield a contradiction, is the language regular?",
+          "back": "No. It may only mean that the witness was unsuitable. Try a different word or another proof technique."
+        },
+        {
+          "front": "How does the pumping lemma show {a^n b^n a^n | n > 0} is nonregular?",
+          "back": "Choose a^p b^p a^p. The pumped segment is a nonempty part of the first a-block. Pumping down changes that block alone, so the three required counts no longer agree."
+        },
+        {
+          "front": "For {a^i b^n | i,n > 0 and i = n or i = 2n}, why is pumping down useful?",
+          "back": "Choose a^p b^p. Deleting a nonempty y from the first a-block leaves fewer than p as and p bs. The a-count is then neither p nor 2p, so neither alternative holds."
+        },
+        {
+          "front": "How can you show {ww | w ∈ {a,b}*} is nonregular?",
+          "back": "Choose a^p b a^p b. Pumping down removes j > 0 as only from the first block. A square containing exactly two bs and ending in b must have equal a-block lengths; the new blocks have lengths p−j and p."
+        },
+        {
+          "front": "Why is {a^(n²) | n ≥ 0} nonregular?",
+          "back": "Choose a^(p²). A valid pumped segment has length j with 1 ≤ j ≤ p. Pumping up gives length p²+j, strictly between consecutive squares p² and (p+1)², so it is not in the language."
+        },
+        {
+          "front": "How can you show {v u^m v^m | m ≥ 0} is nonregular?",
+          "back": "Choose v u^p v^p. If y contains the first v, pumping down removes the required prefix. Otherwise y is a nonempty block of us; pumping down makes the u-count smaller than the final v-count."
+        },
+        {
+          "front": "What does it mean for a class of languages to be closed under an operation?",
+          "back": "Applying the operation to languages in the class always produces another language **in the same class**."
+        },
+        {
+          "front": "Which operations preserve regularity?",
+          "back": "**Union, intersection, concatenation, Kleene star and complement** preserve regular languages. Complement is taken relative to a fixed alphabet Σ*."
+        },
+        {
+          "front": "How can closure under intersection prove a language nonregular?",
+          "back": "Assume L regular and intersect it with a carefully chosen regular language R. If L ∩ R is a known nonregular language, closure gives a contradiction."
+        },
+        {
+          "front": "Use closure to show that strings with equal numbers of as and bs are nonregular.",
+          "back": "Let Equal = {w | #a(w) = #b(w)}. Then **Equal ∩ a*b* = {a^n b^n}**. If Equal were regular, that intersection would be regular, contradicting its known nonregularity."
+        },
+        {
+          "front": "What is the complement of L over alphabet Σ?",
+          "back": "**Σ* \\ L**: all strings over Σ that are not in L."
+        },
+        {
+          "front": "What is a decision procedure?",
+          "back": "An effective algorithm that **halts on every input** and correctly answers a yes/no question. A problem with such a procedure is decidable."
+        },
+        {
+          "front": "Which four questions about regular languages are decidable in the lecture?",
+          "back": "**Membership:** is w in L? **Emptiness:** is L empty? **Finiteness:** is L finite? **Equivalence:** do two automata or REs describe the same language?"
+        },
+        {
+          "front": "What are the four classes in the Chomsky hierarchy?",
+          "back": "**Type 3:** regular, finite automata. **Type 2:** context-free, pushdown automata. **Type 1:** context-sensitive, linear bounded automata. **Type 0:** recursively enumerable, Turing machines."
+        },
+        {
+          "front": "Does nonregular mean not context-free?",
+          "back": "No. **{a^n b^n | n ≥ 0}** is nonregular but context-free. Failure of a weaker model does not imply failure of a more powerful one."
+        },
+        {
+          "front": "What is the difference between a regularity proof and a nonregularity proof?",
+          "back": "For regularity, build an equivalent FSA/RE or apply closure. For nonregularity, prove no FSA can work, often using pumping or a closure-based contradiction."
+        }
+      ]
+    },
+    {
+      "name": "Week 4: Context-Free Grammars and PDAs",
+      "sources": [
+        "CFGA_2023.pdf",
+        "Ex4CFG_2023.pdf",
+        "qCFGegs.pdf"
+      ],
+      "cards": [
+        {
+          "front": "What are the four components of a context-free grammar?",
+          "back": "**(N, Σ, R, S)**: nonterminals N, terminals Σ, production rules R, and start nonterminal S ∈ N. N and Σ are disjoint finite sets."
+        },
+        {
+          "front": "What form must a context-free production have?",
+          "back": "**A → α**, where A is one nonterminal and α is a finite string of terminals and/or nonterminals, possibly ε."
+        },
+        {
+          "front": "Why is a context-free grammar called context-free?",
+          "back": "A nonterminal may be replaced using one of its productions **regardless of the surrounding symbols**."
+        },
+        {
+          "front": "What is the difference between a terminal and a nonterminal?",
+          "back": "Terminals are symbols of the final word’s alphabet. Nonterminals are variables expanded by production rules; a completed word contains none of them."
+        },
+        {
+          "front": "What does the bar in S → aSb | ε mean?",
+          "back": "It separates **alternative productions**: S → aSb and S → ε."
+        },
+        {
+          "front": "What is a derivation?",
+          "back": "A sequence of rule applications starting at S. Each step replaces a nonterminal with the right-hand side of one of its productions."
+        },
+        {
+          "front": "When is a string generated by a CFG?",
+          "back": "When a derivation from S ends in that string and it contains **only terminals**, or is ε."
+        },
+        {
+          "front": "How do you read the word represented by a parse tree?",
+          "back": "Read its terminal leaves **from left to right**. The root is the start symbol, and each internal expansion follows a grammar production."
+        },
+        {
+          "front": "For S → AB | B, A → B | CC, B → b, C → c, what is the language?",
+          "back": "**{bb, ccb, b}**. The grammar has no recursive productions, so these three derivations exhaust its possibilities."
+        },
+        {
+          "front": "Derive ccb from S → AB | B, A → B | CC, B → b, C → c.",
+          "back": "**S ⇒ AB ⇒ CCB ⇒ cCB ⇒ ccB ⇒ ccb**. Each step expands one nonterminal."
+        },
+        {
+          "front": "Give a CFG for {a^n b^n | n > 0}.",
+          "back": "**S → aSb | ab**. Each recursive step adds one a at the front and one b at the end; the base case ensures n ≥ 1."
+        },
+        {
+          "front": "Give a CFG for {a^n b^n | n ≥ 0}.",
+          "back": "**S → aSb | ε**. The ε base case includes n = 0."
+        },
+        {
+          "front": "Derive aabb using S → aSb | ε.",
+          "back": "**S ⇒ aSb ⇒ aaSbb ⇒ aabb**."
+        },
+        {
+          "front": "Can ε be the left-hand side of a CFG production?",
+          "back": "No. The left-hand side must be a **single nonterminal**. ε denotes the empty string and may occur as a right-hand side."
+        },
+        {
+          "front": "Why can recursion generate an infinite language?",
+          "back": "A productive recursive rule can be repeated arbitrarily many times before a terminating rule is chosen, producing words of unbounded length."
+        },
+        {
+          "front": "Give a CFG for all palindromes over {a,b}.",
+          "back": "**S → aSa | bSb | a | b | ε**. Matching outer symbols preserve symmetry; a and b give odd lengths, and ε gives even lengths."
+        },
+        {
+          "front": "Give a CFG for {a^n b^m c^(n+m) | n,m ≥ 0}.",
+          "back": "**S → aSc | X**\n**X → bXc | ε**\nEach a and each b adds one c, while the two stages enforce a-block then b-block then c-block."
+        },
+        {
+          "front": "Give a CFG for {b^n c a^n | n ≥ 0}.",
+          "back": "**S → bSa | c**. Every recursive step adds a matching b and a around the central c."
+        },
+        {
+          "front": "Give a CFG for properly balanced parentheses.",
+          "back": "**S → (S)S | ε**. `(S)` creates a matched pair with balanced contents; the final S permits another balanced sequence."
+        },
+        {
+          "front": "Why is S → (S) | ε insufficient for all balanced parentheses?",
+          "back": "It creates nested pairs such as (()) but cannot generate **()()**. A concatenation mechanism is needed as well."
+        },
+        {
+          "front": "Give a CFG for {a^n b^j a^(2n) b^i | n,i,j ≥ 0}.",
+          "back": "**S → AB**\n**A → aAaa | C**\n**C → bC | ε**\n**B → bB | ε**\nA ties the first a-block to twice as many later as; C and B generate the independent b-blocks."
+        },
+        {
+          "front": "Give a CFG for {a^n b^n a^m b^(2m) | n,m ≥ 0}.",
+          "back": "**S → AB**\n**A → aAb | ε**\n**B → aBbb | ε**\nA and B enforce their counts independently, then concatenate."
+        },
+        {
+          "front": "Give a CFG for {a^m c^n de c^n | m,n ≥ 0}.",
+          "back": "**S → aS | T**\n**T → cTc | de**\nThe a-prefix is independent; T places equal c-blocks around de."
+        },
+        {
+          "front": "How can a DFSA be converted into a CFG?",
+          "back": "Create a nonterminal R_q for each state. For δ(q,a)=r, add **R_q → aR_r**. For accepting q, add **R_q → ε**. Use the start state’s nonterminal as the grammar start."
+        },
+        {
+          "front": "What does a pushdown automaton add to a finite automaton?",
+          "back": "An **unbounded last-in, first-out stack**. It can retain information such as counts or a reversed prefix that finite control alone cannot store."
+        },
+        {
+          "front": "What are the six PDA components used in this module?",
+          "back": "**(Q, Σ, Γ, δ, s₀, F)**: states, input alphabet, stack alphabet, transition relation, initial state, accepting states."
+        },
+        {
+          "front": "What do the components of a PDA transition ((s,a,u),(t,v)) mean?",
+          "back": "In state s, read a, pop u, push v and move to t. An ε in the input, pop or push position means that operation consumes or changes nothing there."
+        },
+        {
+          "front": "What does the PDA label a, ε → A mean?",
+          "back": "Consume one a and **push A without popping**. ε in the pop position does not require the stack to be empty."
+        },
+        {
+          "front": "What does the PDA label b, A → ε mean?",
+          "back": "Consume one b and **pop an A** from the top. This transition is unavailable unless A is currently on top."
+        },
+        {
+          "front": "Under this module’s PDA convention, when is an input accepted?",
+          "back": "There must be a computation that consumes **all input**, reaches an **accepting state**, and leaves the **stack empty**. The initial stack is empty too."
+        },
+        {
+          "front": "How can a PDA recognise {a^n b^n | n ≥ 0}?",
+          "back": "Push one marker for each a. Switch to a second phase on the first b and pop one marker per b; do not allow as in that phase. Accept exactly when all input is read with an empty stack, including ε via the appropriate start state."
+        },
+        {
+          "front": "Why must a PDA for a^n b^n track phases as well as balance the stack?",
+          "back": "Equal counts alone would permit interleaved inputs such as abab. Separate states enforce that **all as occur before all bs**."
+        },
+        {
+          "front": "Trace the stack sizes for aabb in a PDA for a^n b^n.",
+          "back": "**0 → 1 → 2 → 1 → 0**. The two as push; the two bs pop. All input is consumed, and the machine ends in its accepting phase with an empty stack."
+        },
+        {
+          "front": "How do you initialise the standard CFG-to-PDA construction?",
+          "back": "Use start state s₀ and accepting state f. Add **((s₀, ε, ε), (f, S))** to push the grammar’s start symbol."
+        },
+        {
+          "front": "How is a grammar production X → w simulated by a PDA?",
+          "back": "Add **((f, ε, X), (f, w))**: consume no input, replace the nonterminal on top with the right-hand side. The leftmost symbol of w must become the stack top."
+        },
+        {
+          "front": "Which terminal transitions complete the CFG-to-PDA construction?",
+          "back": "For every terminal a, add **((f, a, a), (f, ε))**. It consumes the input symbol only when the same terminal is on top of the stack."
+        },
+        {
+          "front": "In what order do you push a production’s right-hand side one symbol at a time?",
+          "back": "**Right to left**, so its leftmost symbol is processed first. For X → abc, push c, then b, then a."
+        },
+        {
+          "front": "What is the relationship between CFGs and nondeterministic PDAs?",
+          "back": "They describe **exactly the same languages: the context-free languages**. There are conversions from CFG to PDA and from PDA to CFG."
+        },
+        {
+          "front": "Why is every regular language context-free?",
+          "back": "An FSA can be treated as a PDA that **never uses its stack**. Hence every FSA language is also a PDA language."
+        },
+        {
+          "front": "Do deterministic and nondeterministic PDAs recognise the same class?",
+          "back": "No. **Nondeterministic PDAs recognise more languages**. In contrast, deterministic and nondeterministic finite automata have equal expressive power."
+        },
+        {
+          "front": "Why does a PDA for unmarked palindromes need nondeterminism?",
+          "back": "While reading the first half it pushes symbols, then must switch to matching and popping. Without a midpoint marker, it must **guess where the middle occurs**."
+        },
+        {
+          "front": "How can you check a proposed CFG beyond deriving a few examples?",
+          "back": "Show that **every generated word** satisfies the language definition and that **every required word** has a derivation. Test ε and boundary values to catch missing or extra cases."
+        }
+      ]
+    },
+    {
+      "name": "Week 5: CFL Pumping Lemma and PDA Practice",
+      "sources": [
+        "Pumping_Lemma_CFLs.pdf",
+        "Ex5PDA.pdf",
+        "Example_PDA_trace.pdf",
+        "PDA1_extra.pdf",
+        "PDA2_extra.pdf",
+        "Coursework_exam_examples.pdf"
+      ],
+      "cards": [
+        {
+          "front": "State the pumping lemma for context-free languages.",
+          "back": "If L is context-free, some **p ≥ 1** exists such that every w ∈ L with |w| ≥ p has a split **w = uvxyz** with **|vy| > 0**, **|vxy| ≤ p**, and **uv^i xy^i z ∈ L for all i ≥ 0**."
+        },
+        {
+          "front": "Which parts are pumped in the CFL pumping lemma?",
+          "back": "**v and y**, using the **same exponent i**. The strings u, x and z remain unchanged."
+        },
+        {
+          "front": "Must both v and y be nonempty?",
+          "back": "No. Either may be empty, but **they cannot both be empty**: |vy| > 0."
+        },
+        {
+          "front": "What does |vxy| ≤ p restrict?",
+          "back": "The full window from the start of v to the end of y, **including x**, has length at most p. This is not a restriction to the beginning of w."
+        },
+        {
+          "front": "Compare the regular and context-free pumping decompositions.",
+          "back": "**Regular:** w = xyz; pump y; |y| > 0; |xy| ≤ p.\n**Context-free:** w = uvxyz; pump v and y together; |vy| > 0; |vxy| ≤ p."
+        },
+        {
+          "front": "What parse-tree idea explains CFL pumping?",
+          "back": "In a sufficiently deep parse tree, a nonterminal repeats along a path. Repeating or removing the derivation between those occurrences pumps the strings on its two sides."
+        },
+        {
+          "front": "How do you use the CFL pumping lemma to prove a language is not context-free?",
+          "back": "Assume it is context-free, take its pumping length p, choose a long word in it, and show that **every valid five-part split** can be pumped outside the language."
+        },
+        {
+          "front": "Can a successful pumping split prove a language is context-free?",
+          "back": "No. The pumping condition is necessary, not sufficient. A CFG or PDA construction is a direct way to prove context-freeness."
+        },
+        {
+          "front": "Why choose a^p b^p c^p to disprove context-freeness of {a^n b^n c^n}?",
+          "back": "The word belongs to the language. A window vxy of length at most p **cannot reach both the a-block and c-block**, because the entire b-block lies between them."
+        },
+        {
+          "front": "What cases must vxy cover in the proof for {a^n b^n c^n}?",
+          "back": "It lies within one block, across the a/b boundary, or across the b/c boundary. It cannot cover all three kinds of symbol."
+        },
+        {
+          "front": "Why does pumping a^p b^p c^p give a contradiction?",
+          "back": "At least one symbol count changes because |vy| > 0, while at least one block’s count stays p. Pumping therefore breaks equal counts or the required block order. The result is outside the language."
+        },
+        {
+          "front": "Does non-context-free imply nonregular?",
+          "back": "Yes. Every regular language is context-free, so a language outside the context-free class is also outside the regular class."
+        },
+        {
+          "front": "How can you prove {a^(3n) b^(2n) c^n | n ≥ 0} is not context-free?",
+          "back": "Choose a^(3p)b^(2p)c^p. A length-p pumping window misses at least one block. Pumping changes at least one count while an unchanged block fixes n = p, so the required 3:2:1 ratio fails (or block order is broken)."
+        },
+        {
+          "front": "For {10^n10^n10^n | n ≥ 0}, what witness makes the CFL pumping proof manageable?",
+          "back": "Choose **10^p10^p10^p**. A window of length at most p includes at most one 1 and can affect at most two of the three zero-blocks."
+        },
+        {
+          "front": "How does pumping 10^p10^p10^p break its language?",
+          "back": "If a pumped part contains 1, pumping changes the required count of three 1s. Otherwise it changes at least one zero-block while another remains length p, breaking equality of all three blocks."
+        },
+        {
+          "front": "How can you show {a^(n+m)b^n a^m b^n | n,m ≥ 0} is not context-free?",
+          "back": "Choose a^(2p)b^p a^p b^p and pump up. A length-p window cannot affect both b-blocks. Changing a b-count unbalances them. If only as change, only one a-block can change, breaking the relation first a-count = first b-count + second a-count. Crossing an ordered block inside a pumped part also breaks the pattern."
+        },
+        {
+          "front": "What witness can disprove context-freeness of {www | w ∈ {a,b}*}?",
+          "back": "Choose **(a^p b)^3**. A length-p pumping window meets at most one b. Pumping a b changes the total from 3 to 4, impossible for a triple. Pumping only as changes at most two a-blocks, so the three copies no longer match."
+        },
+        {
+          "front": "What information belongs in each line of a PDA trace?",
+          "back": "The **current state, unread input, and full stack**. State which end of your written stack is the top, and include ε-transitions as separate steps."
+        },
+        {
+          "front": "Why must ε-transitions be included in a PDA trace?",
+          "back": "They can change the state and stack without consuming input. Omitting them can give incorrect stack counts or hide possible computation paths."
+        },
+        {
+          "front": "In Exercise 5, an a pushes A on s₀ → u, then an ε-step u → s₀ pushes another A. How many As does each input a add?",
+          "back": "**Two As**. One is pushed while reading a and one by the compulsory ε-transition back to s₀."
+        },
+        {
+          "front": "In Exercise 5, why is aabb rejected by that PDA?",
+          "back": "Two as push **four As**. Two bs pop only two, leaving AA after all input is read. The machine reaches v, but the stack is not empty."
+        },
+        {
+          "front": "Trace Exercise 5’s PDA on aabbbb (top of stack written leftmost).",
+          "back": "**(s₀, aabbbb, ε)**\n→ (u, abbbb, A)\n→ (s₀, abbbb, AA)\n→ (u, bbbb, AAA)\n→ (s₀, bbbb, AAAA)\n→ (v, bbb, AAA)\n→ (v, bb, AA)\n→ (v, b, A)\n→ **(v, ε, ε)**: accept."
+        },
+        {
+          "front": "Which language does the Exercise 5 PDA recognise?",
+          "back": "**{a^n b^(2n) | n ≥ 1}**. Every a pushes two markers and each b pops one. ε is rejected because s₀ is not accepting and there is no transition from it without reading input."
+        },
+        {
+          "front": "Give a CFG for the Exercise 5 PDA’s language.",
+          "back": "**S → aSbb | abb**. The base word has one a and two bs; each recursive step adds one a and two bs."
+        },
+        {
+          "front": "For S → XaaX and X → aX | bX | ε, what language is generated?",
+          "back": "**(a ∪ b)*aa(a ∪ b)***: all strings over {a,b} containing the substring aa."
+        },
+        {
+          "front": "Which replacement transitions simulate S → XaaX and X → aX | bX | ε?",
+          "back": "At working state f, use ε-input stack replacements **S → XaaX**, **X → aX**, **X → bX**, and **X → ε**. Also push S initially and add matching pop transitions for terminals a and b."
+        },
+        {
+          "front": "For S → Xa | Yb, X → Sb | b, Y → Sa | a, eliminate X and Y to describe S.",
+          "back": "Substitution gives **S → Sba | Sab | ba | ab**. The language is **(ab ∪ ba)+**: one or more blocks, each either ab or ba."
+        },
+        {
+          "front": "Which stack replacements arise from S → Xa | Yb, X → Sb | b, Y → Sa | a?",
+          "back": "Use one ε-input transition per alternative: **S → Xa**, **S → Yb**, **X → Sb**, **X → b**, **Y → Sa**, **Y → a**. Initialise with S and match terminal a or b against the stack top."
+        },
+        {
+          "front": "For S → ABg, A → gAc | gc, B → gB | ε, what language is generated?",
+          "back": "**{g^n c^n g^m | n ≥ 1, m ≥ 1}**. A generates matching g/c blocks; B generates zero or more gs, and the final explicit g guarantees a nonempty suffix."
+        },
+        {
+          "front": "Give a derivation of gggcccggg from S → ABg, A → gAc | gc, B → gB | ε.",
+          "back": "**S ⇒ ABg ⇒ gAcBg ⇒ ggAccBg ⇒ gggcccBg ⇒ gggcccgBg ⇒ gggcccggBg ⇒ gggcccggg**."
+        },
+        {
+          "front": "What is the stack alphabet for the standard PDA built from S → ABg, A → gAc | gc, B → gB | ε?",
+          "back": "**Γ = {S, A, B, g, c}**: all grammar nonterminals and terminals. The input alphabet is just {g, c}."
+        },
+        {
+          "front": "Which PDA transitions simulate A → gAc | gc and B → gB | ε?",
+          "back": "At f, add **((f, ε, A),(f, gAc))**, **((f, ε, A),(f, gc))**, **((f, ε, B),(f, gB))**, and **((f, ε, B),(f, ε))**. Push each right-hand side so its leftmost symbol is on top."
+        },
+        {
+          "front": "Give a CFG for {g^m c^k g^n | m > 0, k > m, n > 0}.",
+          "back": "**S → XYZ**\n**X → gXc | gc**\n**Y → cY | c**\n**Z → gZ | g**\nX balances the initial gs with cs; Y adds at least one extra c; Z supplies at least one final g."
+        },
+        {
+          "front": "In the provided PDA trace for aababccb, what state sequence is followed?",
+          "back": "**1 → 2 → 1 → 3 → 2 → 1 → 2 → 4 → 4**. Each step consumes the next input character."
+        },
+        {
+          "front": "In the provided aababccb trace, what is the stack after each symbol (top left)?",
+          "back": "**ε → + → −+ → −−+ → −−−+ → −−+ → −+ → + → ε**. The final state is 4, an accepting state, and the input is exhausted."
+        },
+        {
+          "front": "Why does the provided PDA accept aababccb?",
+          "back": "The displayed path consumes **all eight symbols**, ends in accepting state 4, and leaves an **empty stack**. All three acceptance requirements hold."
+        },
+        {
+          "front": "In the extra deterministic PDA exercise, what state path accepts aaabbaabbb?",
+          "back": "**1 → 2 → 2 → 2 → 3 → 3 → 4 → 4 → 5 → 5 → 5**. The first as push stars, the next bs push hashes, the next as pop hashes, and the final bs pop stars."
+        },
+        {
+          "front": "What stack sequence accompanies aaabbaabbb in the extra PDA exercise (top left)?",
+          "back": "`ε → * → ** → *** → #*** → ##*** → #*** → *** → ** → * → ε`. The computation finishes in accepting state 5 after all input is read."
+        },
+        {
+          "front": "Give a CFG for the extra exercise’s language {ac^m b^n ca^n | n,m ≥ 0}.",
+          "back": "**S → aCT**\n**C → cC | ε**\n**T → bTa | c**\nC supplies the independent c-prefix; T balances each b with a later a around the central c."
+        },
+        {
+          "front": "What does reaching an accepting PDA state with unread input tell you?",
+          "back": "It is **not yet acceptance**. The chosen computation must still consume the entire input and satisfy the module’s empty-stack requirement."
+        },
+        {
+          "front": "Why is a correct stack count alone insufficient when checking a PDA?",
+          "back": "You must also check **symbol order, transition availability, final state and complete input consumption**. A stack may be empty after an invalid or unfinished prefix."
+        },
+        {
+          "front": "What final checks should accompany an exam CFG-to-PDA answer?",
+          "back": "State Q, Σ, Γ, s₀ and F; include the initial push, every production alternative and every terminal match; specify push order and the acceptance convention; trace a short accepted and rejected input."
+        }
+      ]
+    }
+  ]
+}

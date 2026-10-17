@@ -55,6 +55,7 @@ struct ImportPreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var files: [ImportBatch.File]
     @State private var isShowingFormats = false
+    @State private var saveError: String?
 
     init(chapter: Chapter, batch: ImportBatch) {
         self.chapter = chapter
@@ -104,6 +105,11 @@ struct ImportPreviewView: View {
             .sheet(isPresented: $isShowingFormats) {
                 FormatGuideView()
             }
+            .alert("Import Not Saved", isPresented: .isPresent($saveError)) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(saveError ?? "")
+            }
         }
     }
 
@@ -119,12 +125,23 @@ struct ImportPreviewView: View {
     }
 
     private func addSelectedCards() {
-        for file in files where file.selectedCount > 0 {
-            let cards = file.candidates.filter(\.isSelected).map(\.card)
-            CardStore.addCards(cards, to: chapter, fileName: file.fileName, kind: file.kind, in: modelContext)
+        do {
+            try modelContext.save()
+        } catch {
+            saveError = error.localizedDescription
+            return
         }
-        CardStore.save(modelContext)
-        dismiss()
+        do {
+            for file in files where file.selectedCount > 0 {
+                let cards = file.candidates.filter(\.isSelected).map(\.card)
+                CardStore.addCards(cards, to: chapter, fileName: file.fileName, kind: file.kind, in: modelContext)
+            }
+            try modelContext.save()
+            dismiss()
+        } catch {
+            modelContext.rollback()
+            saveError = error.localizedDescription
+        }
     }
 }
 

@@ -6,13 +6,10 @@ import SwiftData
 @MainActor
 enum UITestLibrary {
     static func seed(into context: ModelContext) throws {
-        SampleData.insertSampleModule(into: context)
-        let module = try context.fetch(FetchDescriptor<StudyModule>())[0]
-        module.name = "Biology"
-        module.details = "Cells, organelles and the language of life."
+        let module = try SampleData.insertSampleModule(into: context)
         for (index, card) in module.allCards.enumerated() {
             card.isFavorite = index % 3 == 0
-            card.tagText = index % 2 == 0 ? "exam, cells" : "vocabulary"
+            card.tagText += index % 2 == 0 ? ", exam" : ", practice"
             if index < 5 {
                 for day in 1...3 {
                     let reviewDate = Calendar.current.date(byAdding: .day, value: -day, to: .now)!

@@ -14,7 +14,7 @@ struct FormatGuideView: View {
     private let csvFormats = [
         Format(
             title: "Two columns",
-            explanation: "The first column is the front of the card, the second is the back. Commas, semicolons and tabs are detected automatically, so Excel, Numbers, Google Sheets, Anki and Quizlet exports work.",
+            explanation: "The first column is the front, the second is the back. Commas, semicolons, tabs and Excel sep= headers are detected automatically. Export Excel or Numbers workbooks as CSV before importing. UTF-8 and UTF-16 exports are supported.",
             example: """
             Mitochondria,Powerhouse of the cell
             Nucleus,Holds the cell's DNA

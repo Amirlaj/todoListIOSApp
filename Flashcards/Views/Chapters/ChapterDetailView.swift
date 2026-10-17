@@ -11,6 +11,7 @@ struct ChapterDetailView: View {
     @State private var isImporting = false
     @State private var importBatch: ImportBatch?
     @State private var importError: String?
+    @State private var isReadingFiles = false
     @State private var isAddingCard = false
     @State private var editingCard: Flashcard?
     @State private var cardPendingDeletion: Flashcard?
@@ -34,6 +35,13 @@ struct ChapterDetailView: View {
             }
         }
         .navigationTitle(chapter.name)
+        .overlay {
+            if isReadingFiles {
+                ProgressView("Reading files…")
+                    .padding(24)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+            }
+        }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Menu {
@@ -305,14 +313,16 @@ struct ChapterDetailView: View {
     private func handlePickedFiles(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
-            let parsedFiles = urls.map { url -> ParsedFile in
-                FlashcardImporter.parsePickedFile(at: url)
-            }
-            guard !parsedFiles.isEmpty else { return }
-            let batch = ImportBatch(parsedFiles: parsedFiles, existingKeys: chapter.duplicateKeys)
-            // Give the document picker time to finish dismissing before presenting the preview.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                importBatch = batch
+            guard !urls.isEmpty, !isReadingFiles else { return }
+            isReadingFiles = true
+            Task { @MainActor in
+                let parsedFiles = await Task.detached(priority: .userInitiated) {
+                    urls.map { FlashcardImporter.parsePickedFile(at: $0) }
+                }.value
+                // Wait for the Files sheet to dismiss before opening the preview.
+                try? await Task.sleep(for: .milliseconds(400))
+                isReadingFiles = false
+                importBatch = ImportBatch(parsedFiles: parsedFiles, existingKeys: chapter.duplicateKeys)
             }
         case .failure(let error):
             importError = error.localizedDescription

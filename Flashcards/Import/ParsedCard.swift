@@ -1,7 +1,7 @@
 import Foundation
 
 /// A flashcard extracted from an imported file, before it is saved to the database.
-struct ParsedCard: Hashable {
+struct ParsedCard: Hashable, Sendable {
     var front: String
     var back: String
 
@@ -21,6 +21,7 @@ struct ParseResult: Equatable {
     var cards: [ParsedCard] = []
     /// Rows or blocks that looked like cards but were missing a front or a back.
     var skipped: Int = 0
+    var errorMessage: String?
 }
 
 /// The kind of file a set of cards was imported from.

@@ -1,0 +1,37 @@
+front,back
+What are the three regular operations?,"**Union (∪), concatenation, and Kleene star (*)**. They combine languages to build regular expressions."
+What does the regular expression a denote?,"The one-word language **{a}**, where a is a symbol of the alphabet."
+How do ε and ∅ differ as regular expressions?,"**ε** denotes {ε}, a language with one empty word. **∅** denotes a language with no words."
+What is concatenation of languages R and S?,"**RS = {rs | r ∈ R and s ∈ S}**. Choose a word from R, then a word from S, and join them in that order."
+Is language concatenation commutative?,"Usually not. If R = {a} and S = {b}, then RS = {ab} but SR = {ba}."
+What does R ∪ S contain?,Every word belonging to **R or S or both**.
+What does R* contain?,"Every concatenation of **zero or more words from R**. Zero repetitions produce ε, so ε always belongs to R*."
+"For R = {ab, ba}, why is abba in R* but aab is not?","`abba = ab · ba`, so it is a concatenation of words in R. Every word in R* has even length; `aab` has length 3."
+What is the precedence of regular-expression operations?,"**Star first, concatenation second, union last.** Use parentheses whenever the intended grouping could be unclear."
+How do ab* and (ab)* differ?,"`ab*` is one a followed by any number of bs: a, ab, abb, … . `(ab)*` repeats the whole block ab: ε, ab, abab, … ."
+"Simplify Rε, εR, R∅ and ∅R.",**Rε = εR = R**. **R∅ = ∅R = ∅**: concatenating with the empty language cannot form any word.
+"Simplify R ∪ ∅, ε* and ∅*.","**R ∪ ∅ = R**. **ε* = ∅* = {ε}** as languages, because zero repetitions always give the empty string."
+Why can R ∪ {ε} differ from R?,It adds the empty string if ε was not already in R. Union with ε is not the same operation as concatenation with ε.
+Give a regular expression for binary strings ending in 1.,**(0 ∪ 1)*1**. An arbitrary binary prefix is followed by a final 1.
+"Give a regular expression for strings over {a,b} starting with bb and containing at least one a.",**bb(a ∪ b)*a(a ∪ b)***. The explicit a guarantees that at least one occurs.
+Give a regular expression for lowercase strings containing the substring kleene.,"**Σ*kleeneΣ***, where Σ = {a, …, z}. The surrounding strings may be empty."
+Give a regular expression for nonnegative decimal integers with no leading zero.,"**0 ∪ ND***, where N = (1 ∪ … ∪ 9) and D = (0 ∪ … ∪ 9). Only the single word 0 starts with zero."
+Give a regular expression for positive decimal integers with no leading zero.,"**ND***, where N = (1 ∪ … ∪ 9) and D = (0 ∪ … ∪ 9). Unlike nonnegative integers, this excludes 0."
+"Give a regular expression for identifiers beginning with a lowercase letter, followed by letters or digits.","**L(L ∪ D)***, where L = (a ∪ … ∪ z) and D = (0 ∪ … ∪ 9)."
+Why do compilers use regular expressions in lexical analysis?,"Token classes such as identifiers, numbers and keywords can be described by REs and converted into finite automata that scan the program text."
+State Kleene’s theorem.,"A language is **regular if and only if a regular expression describes it**. REs, NFSAs and DFSAs have the same expressive power."
+How do you construct an NFSA for the union of two languages?,"Add a fresh start state with ε-transitions to the two component start states. Keep the component accepting states, or link them to a fresh final state."
+How do you construct an NFSA for concatenation RS?,Connect every accepting state of the R machine to the start of the S machine by an ε-transition. Start in R; only S’s accepting states accept the concatenation.
+How do you adapt an NFSA for R to recognise R*?,"Allow an empty computation to accept, and add ε-transitions that permit another run of R after each successful run. The machine can choose zero, one or many repetitions."
+What is a generalised NFSA (GNFA)?,"An automaton whose edges can be labelled by **regular expressions**, allowing one edge to match a whole string. It is also called a transition graph."
+Does adding regular-expression labels make a GNFA more expressive than an FSA?,No. Each RE-labelled edge can be expanded into an ordinary NFSA. The recognised language is still regular.
+How do you prepare a GNFA for state elimination?,Use a distinct start state with no incoming edges and one accepting state with no outgoing edges. Add fresh states and ε-transitions as needed.
+How are parallel GNFA edges in the same direction combined?,Replace them by one edge labelled with the **union** of their expressions. Parallel loops are combined in the same way.
+"When eliminating state k, what is the new expression from state i to state j?","**Rᵢⱼ ∪ Rᵢₖ(Rₖₖ)*Rₖⱼ**. Preserve the direct route and add all routes through k, including zero or more loops at k."
+What if the eliminated state has no loop?,Treat the loop label as ∅; then ∅* = ε. The new route is just the incoming expression concatenated with the outgoing expression.
+"Eliminate a state with incoming label a, loop a ∪ b, and outgoing label ba. What new route is added?","**a(a ∪ b)*ba**. The order is incoming label, repeated loop, outgoing label."
+Does the order of state elimination affect the recognised language?,"No. It may produce differently shaped REs, but all are **equivalent** if each elimination preserves every possible route."
+Why does the state-elimination algorithm terminate?,"Each elimination removes one non-start, non-final state. A finite automaton eventually has only its start and final states; the connecting expression describes its language."
+Give a simple RE for strings containing aa or bb.,**(a ∪ b)*(aa ∪ bb)(a ∪ b)***. The middle part forces two equal adjacent symbols.
+Does every language have a regular expression?,"No. Every **regular** language does. For example, {a^n b^n | n ≥ 0} is nonregular, so no classical RE describes it."
+What language does a(a ∪ b)*b describe?,"Strings over {a,b} that **start with a and end with b**, with length at least 2. It includes ab, aab and abb, but not a or ba."

@@ -27,9 +27,10 @@ struct StudyView: View {
     @State private var isAdvancing = false
     @State private var hasStarted = false
     @State private var saveError: String?
+    @State private var advanceTask: Task<Void, Never>?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let swipeThreshold: CGFloat = 110
+    private let swipeThreshold: CGFloat = 80
 
     private var currentCard: Flashcard? {
         queue.indices.contains(index) ? queue[index] : nil
@@ -65,6 +66,7 @@ struct StudyView: View {
             start(with: session.cards)
             hasStarted = true
         }
+        .onDisappear { advanceTask?.cancel() }
         .alert("Review Not Saved", isPresented: .isPresent($saveError)) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -92,7 +94,10 @@ struct StudyView: View {
             .transition(.asymmetric(insertion: .scale(scale: 0.92).combined(with: .opacity), removal: .identity))
             .frame(maxWidth: 640)
             .onTapGesture(perform: flip)
-            .gesture(dragGesture)
+            .simultaneousGesture(dragGesture)
+            .accessibilityIdentifier("study-card")
+            .accessibilityAction(named: "Reject card") { grade(knewIt: false) }
+            .accessibilityAction(named: "Accept card") { grade(knewIt: true) }
 
             controls
         }
@@ -122,7 +127,7 @@ struct StudyView: View {
         let progress = min(abs(dragOffset.width) / swipeThreshold, 1)
         if dragOffset.width != 0 {
             let knew = dragOffset.width > 0
-            Text(knew ? "GOT IT" : "AGAIN")
+            Label(knew ? "ACCEPTED" : "REJECTED", systemImage: knew ? "checkmark" : "xmark")
                 .font(.headline.weight(.heavy))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 14)
@@ -166,27 +171,30 @@ struct StudyView: View {
                 .keyboardShortcut(.space, modifiers: [])
             }
 
-            Text("Tap the card to flip it. Swipe right if you knew it, left if you didn’t.")
+            Text("Swipe left to reject, right to accept. Tap to flip the card at any time.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .controlSize(.large)
         .frame(maxWidth: 640)
+        .disabled(isAdvancing)
     }
 
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: 15)
             .onChanged { value in
-                guard !isAdvancing, isRevealed else { return }
+                guard !isAdvancing,
+                      abs(value.translation.width) > abs(value.translation.height) else { return }
                 dragOffset = value.translation
             }
             .onEnded { value in
-                guard !isAdvancing, isRevealed else { return }
-                if abs(value.translation.width) > swipeThreshold {
+                guard !isAdvancing else { return }
+                if abs(value.translation.width) >= swipeThreshold,
+                   abs(value.translation.width) > abs(value.translation.height) * 1.2 {
                     grade(knewIt: value.translation.width > 0)
                 } else {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7)) {
                         dragOffset = .zero
                     }
                 }
@@ -219,6 +227,7 @@ struct StudyView: View {
         } label: {
             Label("Options", systemImage: "slider.horizontal.3")
         }
+        .disabled(isAdvancing)
     }
 
     // MARK: - Summary
@@ -298,6 +307,7 @@ struct StudyView: View {
     // MARK: - Actions
 
     private func start(with cards: [Flashcard]) {
+        advanceTask?.cancel()
         queue = shuffle ? cards.shuffled() : cards
         index = 0
         knownCount = 0
@@ -315,10 +325,13 @@ struct StudyView: View {
     }
 
     private func grade(knewIt: Bool) {
-        guard !isAdvancing, isRevealed, let card = currentCard else { return }
+        guard !isAdvancing, let card = currentCard else { return }
         do {
             try StudyStore.review(card, correct: knewIt, in: modelContext)
         } catch {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7)) {
+                dragOffset = .zero
+            }
             saveError = error.localizedDescription
             return
         }
@@ -333,10 +346,15 @@ struct StudyView: View {
         withAnimation(reduceMotion ? nil : .easeIn(duration: 0.22)) {
             dragOffset = CGSize(width: exitDistance, height: dragOffset.height)
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0 : 0.22)) {
+        advanceTask = Task { @MainActor in
+            if !reduceMotion {
+                do { try await Task.sleep(for: .milliseconds(220)) }
+                catch { return }
+            }
+            guard !Task.isCancelled else { return }
             isRevealed = false
             dragOffset = .zero
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.85)) {
                 index += 1
             }
             isAdvancing = false

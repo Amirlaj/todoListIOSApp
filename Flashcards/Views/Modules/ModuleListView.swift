@@ -42,6 +42,9 @@ struct ModuleListView: View {
                         } label: {
                             Label("Import Module", systemImage: "square.and.arrow.down")
                         }
+                        Button(action: addSample) {
+                            Label("Add Theory of Computation Sample", systemImage: "sparkles")
+                        }
                     } label: {
                         Label("Add Module", systemImage: "plus")
                     }
@@ -141,10 +144,19 @@ struct ModuleListView: View {
             }
             .buttonStyle(.borderedProminent)
 
-            Button("Add a Sample Module") {
-                SampleData.insertSampleModule(into: modelContext)
-            }
+            Button("Add a Sample Module", action: addSample)
+            Text("Theory of Computation · 5 weeks")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             Button("Import Module Backup") { isImportingModule = true }
+        }
+    }
+
+    private func addSample() {
+        do {
+            try SampleData.insertSampleModule(into: modelContext)
+        } catch {
+            importError = error.localizedDescription
         }
     }
 }
